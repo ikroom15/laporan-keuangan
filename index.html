@@ -237,7 +237,15 @@
       <div class="fg"><label>📝 Deskripsi</label><textarea id="tx-desc"></textarea></div>
       <button class="btn btn-primary" id="btn-save-tx">💾 SIMPAN</button>
     </div>
-    <div class="card"><div class="sh"><div class="sh-title">📋 Hari Ini</div></div><div id="tx-today"></div></div>
+
+    <!-- Daftar transaksi per tanggal -->
+    <div class="card">
+      <div class="sh">
+        <div class="sh-title">📋 Transaksi Tanggal</div>
+        <input type="date" id="tx-view-date" style="width:auto;padding:6px 10px;font-size:13px;border-radius:8px;">
+      </div>
+      <div id="tx-list-by-date"></div>
+    </div>
   </div>
 
   <!-- Transfer -->
@@ -616,6 +624,9 @@
     document.getElementById('tx-date').value = today();
     setTxType(txType);
     fillAccountSelect('tx-account');
+    // Set view date to today
+    document.getElementById('tx-view-date').value = today();
+    renderTxByDate(today());
   };
   const setTxType = type => {
     txType = type;
@@ -652,16 +663,21 @@
     document.getElementById('tx-amount').value = '';
     document.getElementById('tx-desc').value = '';
     toast('✅ Transaksi tersimpan!', 'ok');
-    renderTxToday();
+    // Refresh list for current view date
+    const viewDate = document.getElementById('tx-view-date').value;
+    renderTxByDate(viewDate || today());
     if (currentPage === 'dashboard') renderDashboard();
   };
-  const renderTxToday = () => {
-    const list = data.transactions.filter(t => t.date === today());
-    const el = document.getElementById('tx-today');
+
+  const renderTxByDate = (date) => {
+    const list = data.transactions.filter(t => t.date === date);
+    const el = document.getElementById('tx-list-by-date');
     if (list.length === 0) {
-      el.innerHTML = '<div class="empty"><div class="ei">📝</div><p>Belum ada transaksi hari ini</p></div>';
+      el.innerHTML = '<div class="empty"><div class="ei">📭</div><p>Tidak ada transaksi pada tanggal ' + fDate(date) + '</p></div>';
       return;
     }
+    // Sort by createdAt descending (newest first)
+    list.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
     el.innerHTML = list.map(t => {
       const isIn = t.type === 'Pemasukan';
       return `<div class="tx-item">
@@ -677,9 +693,11 @@
         </div>
       </div>`;
     }).join('');
-    document.querySelectorAll('.edit-tx-btn').forEach(b => b.addEventListener('click', () => openEditTx(b.dataset.id)));
-    document.querySelectorAll('.del-tx-btn').forEach(b => b.addEventListener('click', () => deleteTx(b.dataset.id)));
+    // Attach event listeners
+    el.querySelectorAll('.edit-tx-btn').forEach(b => b.addEventListener('click', () => openEditTx(b.dataset.id)));
+    el.querySelectorAll('.del-tx-btn').forEach(b => b.addEventListener('click', () => deleteTx(b.dataset.id)));
   };
+
   const openEditTx = id => {
     const t = data.transactions.find(x => x.id === id);
     if (!t) return;
@@ -705,14 +723,19 @@
     save();
     closeModal('m-edit-tx');
     toast('✅ Transaksi diupdate!', 'ok');
-    renderPage(currentPage);
+    // Refresh current view
+    const viewDate = document.getElementById('tx-view-date').value;
+    renderTxByDate(viewDate || today());
+    if (currentPage === 'dashboard') renderDashboard();
   };
   const deleteTx = id => {
     if (!confirm('Hapus transaksi ini?')) return;
     data.transactions = data.transactions.filter(t => t.id !== id);
     save();
     toast('🗑️ Transaksi dihapus', 'info');
-    renderPage(currentPage);
+    const viewDate = document.getElementById('tx-view-date').value;
+    renderTxByDate(viewDate || today());
+    if (currentPage === 'dashboard') renderDashboard();
   };
 
   // ============ TRANSFER ============
@@ -1171,33 +1194,22 @@
         const rawData = JSON.parse(ev.target.result);
         
         // === AUTO-MIGRASI DATA LAMA ===
-        // Cari akun Tunai atau buat
         let tunai = data.accounts.find(a => a.name === 'Tunai');
         if (!tunai) {
           tunai = { id: genId(), name: 'Tunai', type: 'cash', initialBalance: 0 };
           data.accounts.push(tunai);
         }
         
-        // Migrasi transaksi
         if (rawData.transactions) {
           rawData.transactions.forEach(t => {
-            if (!t.accountId) {
-              t.accountId = tunai.id;
-            }
+            if (!t.accountId) t.accountId = tunai.id;
           });
           data.transactions = rawData.transactions;
         }
-        
-        // Migrasi hutang
         if (rawData.debts) {
-          rawData.debts.forEach(d => {
-            if (!d.accountId) d.accountId = '';
-            if (!d.notes) d.notes = '';
-          });
+          rawData.debts.forEach(d => { if (!d.accountId) d.accountId = ''; if (!d.notes) d.notes = ''; });
           data.debts = rawData.debts;
         }
-        
-        // Migrasi auto incomes
         if (rawData.autoIncomes) {
           rawData.autoIncomes.forEach(ai => {
             if (!ai.accountId) ai.accountId = tunai.id;
@@ -1205,13 +1217,10 @@
           });
           data.autoIncomes = rawData.autoIncomes;
         }
-        
-        // Restore lainnya
         if (rawData.autoIncomeLog) data.autoIncomeLog = rawData.autoIncomeLog;
         if (rawData.transfers) data.transfers = rawData.transfers;
         if (rawData.customCategories) data.customCategories = rawData.customCategories;
         
-        // Simpan
         save();
         toast('✅ Data berhasil direstore! (' + data.transactions.length + ' transaksi)', 'ok');
         showPage('dashboard');
@@ -1228,7 +1237,7 @@
   const renderPage = (page) => {
     switch(page) {
       case 'dashboard': renderDashboard(); break;
-      case 'transaksi': setupTxForm(); renderTxToday(); break;
+      case 'transaksi': setupTxForm(); break;
       case 'transfer': setupTransferForm(); renderTransferHistory(); break;
       case 'riwayat': renderHistory(); break;
       case 'hutang': renderDebtList(); break;
@@ -1262,6 +1271,11 @@
     });
     document.getElementById('btn-save-tx').addEventListener('click', saveTx);
     document.getElementById('add-account-tx').addEventListener('click', () => openAddAccountModal(() => fillAccountSelect('tx-account')));
+    
+    // View date change
+    document.getElementById('tx-view-date').addEventListener('change', function() {
+      renderTxByDate(this.value);
+    });
 
     // Transfer
     document.getElementById('btn-transfer').addEventListener('click', doTransfer);
