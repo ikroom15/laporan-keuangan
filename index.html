@@ -70,6 +70,7 @@
     .sc-in { background: linear-gradient(135deg, #059669, #10b981); }
     .sc-out { background: linear-gradient(135deg, #dc2626, #f87171); }
     .sc-debt { background: linear-gradient(135deg, #d97706, #fbbf24); }
+    .sc-net { background: linear-gradient(135deg, #7c3aed, #8b5cf6); grid-column: 1/-1; }
 
     .fg { margin-bottom: 14px; }
     label { display: block; font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .3px; }
@@ -213,6 +214,10 @@
       <div class="sc sc-out"><div class="sl">Pengeluaran Bulan Ini</div><div class="sv" id="d-expense">Rp 0</div></div>
       <div class="sc sc-debt"><div class="sl">Hutang Aktif</div><div class="sv" id="d-debt">Rp 0</div></div>
     </div>
+    <!-- SALDO BERSIH -->
+    <div class="sg" style="grid-template-columns:1fr;">
+      <div class="sc sc-net"><div class="sl">🧾 Saldo Bersih (Total Saldo − Hutang)</div><div class="sv" id="d-net-balance">Rp 0</div></div>
+    </div>
     <div class="card"><div class="sh"><div class="sh-title">💰 Saldo Per Akun</div></div><div id="d-account-balances"></div></div>
     <div class="card"><div class="sh"><div class="sh-title">📊 Grafik 6 Bulan</div></div><div class="chart-wrap"><canvas id="barChart"></canvas></div></div>
     <div class="card"><div class="sh-title" style="margin-bottom:12px">⚡ Aksi Cepat</div>
@@ -231,7 +236,13 @@
     <div class="card">
       <div class="fg"><label>Tipe</label><div class="seg" id="tx-seg"><button class="active" data-type="Pemasukan">📈 Pemasukan</button><button data-type="Pengeluaran">📉 Pengeluaran</button></div></div>
       <div class="fg"><label>📅 Tanggal</label><input type="date" id="tx-date"></div>
-      <div class="fg"><label>🏷️ Kategori</label><select id="tx-cat"></select></div>
+      <div class="fg">
+        <label>🏷️ Kategori</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select id="tx-cat" style="flex:1;"></select>
+          <button class="btn btn-sm btn-secondary" id="btn-manage-cat" style="flex-shrink:0;">✏️</button>
+        </div>
+      </div>
       <div class="fg"><label>💵 Jumlah</label><div class="rp-wrap"><span class="rp-prefix">Rp</span><input type="text" id="tx-amount" inputmode="numeric"></div></div>
       <div class="fg"><label>🏦 Akun</label><div class="select-with-add"><select id="tx-account"></select><button class="select-add-btn" id="add-account-tx">+</button></div></div>
       <div class="fg"><label>📝 Deskripsi</label><textarea id="tx-desc"></textarea></div>
@@ -414,6 +425,21 @@
   </div>
 </div>
 
+<!-- Modal Kelola Kategori -->
+<div id="m-manage-cat" class="mo">
+  <div class="mb">
+    <div class="m-title">⚙️ Kelola Kategori</div>
+    <div class="fg"><label>Tipe</label><select id="manage-cat-type"><option value="Pemasukan">📈 Pemasukan</option><option value="Pengeluaran">📉 Pengeluaran</option></select></div>
+    <div class="fg"><label>Nama Kategori Baru</label><input type="text" id="manage-cat-label" placeholder="Misal: 💰 Royalti, 🎨 Hobi"></div>
+    <button class="btn btn-primary" id="btn-add-custom-cat" style="background:#7c3aed;">➕ Tambah Kategori</button>
+    <div class="fg" style="margin-top:16px;">
+      <label>Kategori Kustom</label>
+      <div id="custom-cat-list"></div>
+    </div>
+    <button class="btn btn-secondary" id="manage-cat-close" style="margin-top:8px;">Tutup</button>
+  </div>
+</div>
+
 <script>
 (function() {
   const STORAGE_KEY = 'dompetku_data';
@@ -562,11 +588,17 @@
     const totalBalance = data.accounts.reduce((s,a) => s + calcBalance(a.id), 0);
     document.getElementById('d-total-balance').textContent = fRp(totalBalance);
     
+    // Hutang aktif (Saya Berhutang yang belum lunas)
+    const activeDebt = data.debts.filter(d => d.status === 'Belum Lunas' && d.debtType === 'Saya Berhutang')
+                        .reduce((s,d) => s + (d.totalAmount - d.paidAmount), 0);
+    const netBalance = totalBalance - activeDebt;
+    document.getElementById('d-net-balance').textContent = fRp(netBalance);
+
     const m = now.getMonth()+1, y = now.getFullYear();
     const monthTx = data.transactions.filter(t => { const my = getMY(t.date); return my.m === m && my.y === y; });
     document.getElementById('d-income').textContent = fRp(monthTx.filter(t=>t.type==='Pemasukan').reduce((s,t)=>s+t.amount,0));
     document.getElementById('d-expense').textContent = fRp(monthTx.filter(t=>t.type==='Pengeluaran').reduce((s,t)=>s+t.amount,0));
-    document.getElementById('d-debt').textContent = fRp(data.debts.filter(d=>d.status==='Belum Lunas'&&d.debtType==='Saya Berhutang').reduce((s,d)=>s+(d.totalAmount-d.paidAmount),0));
+    document.getElementById('d-debt').textContent = fRp(activeDebt);
 
     const ab = document.getElementById('d-account-balances');
     if (data.accounts.length === 0) {
@@ -624,7 +656,6 @@
     document.getElementById('tx-date').value = today();
     setTxType(txType);
     fillAccountSelect('tx-account');
-    // Set view date to today
     document.getElementById('tx-view-date').value = today();
     renderTxByDate(today());
   };
@@ -663,7 +694,6 @@
     document.getElementById('tx-amount').value = '';
     document.getElementById('tx-desc').value = '';
     toast('✅ Transaksi tersimpan!', 'ok');
-    // Refresh list for current view date
     const viewDate = document.getElementById('tx-view-date').value;
     renderTxByDate(viewDate || today());
     if (currentPage === 'dashboard') renderDashboard();
@@ -676,7 +706,6 @@
       el.innerHTML = '<div class="empty"><div class="ei">📭</div><p>Tidak ada transaksi pada tanggal ' + fDate(date) + '</p></div>';
       return;
     }
-    // Sort by createdAt descending (newest first)
     list.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
     el.innerHTML = list.map(t => {
       const isIn = t.type === 'Pemasukan';
@@ -693,7 +722,6 @@
         </div>
       </div>`;
     }).join('');
-    // Attach event listeners
     el.querySelectorAll('.edit-tx-btn').forEach(b => b.addEventListener('click', () => openEditTx(b.dataset.id)));
     el.querySelectorAll('.del-tx-btn').forEach(b => b.addEventListener('click', () => deleteTx(b.dataset.id)));
   };
@@ -723,7 +751,6 @@
     save();
     closeModal('m-edit-tx');
     toast('✅ Transaksi diupdate!', 'ok');
-    // Refresh current view
     const viewDate = document.getElementById('tx-view-date').value;
     renderTxByDate(viewDate || today());
     if (currentPage === 'dashboard') renderDashboard();
@@ -1148,6 +1175,54 @@
     `;
   };
 
+  // ============ KELOLA KATEGORI ============
+  const renderCustomCategories = () => {
+    const type = document.getElementById('manage-cat-type').value;
+    const list = data.customCategories.filter(c => c.type === type);
+    const el = document.getElementById('custom-cat-list');
+    if (!list.length) {
+      el.innerHTML = '<p style="color:var(--muted)">Belum ada kategori kustom untuk tipe ini.</p>';
+      return;
+    }
+    el.innerHTML = list.map(c => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f1f5f9;">
+        <span>${c.label}</span>
+        <button class="btn btn-sm btn-danger del-custom-cat" data-id="${c.id}">🗑️</button>
+      </div>
+    `).join('');
+    el.querySelectorAll('.del-custom-cat').forEach(b => {
+      b.addEventListener('click', () => {
+        if (!confirm('Hapus kategori ini?')) return;
+        data.customCategories = data.customCategories.filter(c => c.id !== b.dataset.id);
+        save();
+        renderCustomCategories();
+        // refresh select di transaksi
+        fillCatSelect('tx-cat', txType);
+        toast('🗑️ Kategori dihapus', 'info');
+      });
+    });
+  };
+  const addCustomCategory = () => {
+    const type = document.getElementById('manage-cat-type').value;
+    const label = document.getElementById('manage-cat-label').value.trim();
+    if (!label) {
+      toast('⚠️ Nama kategori tidak boleh kosong!', 'err');
+      return;
+    }
+    // cek duplikat
+    const exist = data.customCategories.find(c => c.type === type && c.label === label);
+    if (exist) {
+      toast('⚠️ Kategori sudah ada!', 'err');
+      return;
+    }
+    data.customCategories.push({ id: genId(), type: type, label: label });
+    save();
+    document.getElementById('manage-cat-label').value = '';
+    renderCustomCategories();
+    fillCatSelect('tx-cat', txType);
+    toast('✅ Kategori ditambahkan!', 'ok');
+  };
+
   // ============ EXPORT ============
   const exportCSV = () => {
     let csv = 'Tanggal,Tipe,Kategori,Deskripsi,Akun,Jumlah\n';
@@ -1192,18 +1267,13 @@
     reader.onload = ev => {
       try {
         const rawData = JSON.parse(ev.target.result);
-        
-        // === AUTO-MIGRASI DATA LAMA ===
         let tunai = data.accounts.find(a => a.name === 'Tunai');
         if (!tunai) {
           tunai = { id: genId(), name: 'Tunai', type: 'cash', initialBalance: 0 };
           data.accounts.push(tunai);
         }
-        
         if (rawData.transactions) {
-          rawData.transactions.forEach(t => {
-            if (!t.accountId) t.accountId = tunai.id;
-          });
+          rawData.transactions.forEach(t => { if (!t.accountId) t.accountId = tunai.id; });
           data.transactions = rawData.transactions;
         }
         if (rawData.debts) {
@@ -1220,11 +1290,9 @@
         if (rawData.autoIncomeLog) data.autoIncomeLog = rawData.autoIncomeLog;
         if (rawData.transfers) data.transfers = rawData.transfers;
         if (rawData.customCategories) data.customCategories = rawData.customCategories;
-        
         save();
         toast('✅ Data berhasil direstore! (' + data.transactions.length + ' transaksi)', 'ok');
         showPage('dashboard');
-        
       } catch (ex) {
         toast('❌ Gagal restore: ' + ex.message, 'err');
         console.error(ex);
@@ -1271,11 +1339,18 @@
     });
     document.getElementById('btn-save-tx').addEventListener('click', saveTx);
     document.getElementById('add-account-tx').addEventListener('click', () => openAddAccountModal(() => fillAccountSelect('tx-account')));
-    
-    // View date change
     document.getElementById('tx-view-date').addEventListener('change', function() {
       renderTxByDate(this.value);
     });
+
+    // Kelola Kategori
+    document.getElementById('btn-manage-cat').addEventListener('click', () => {
+      openModal('m-manage-cat');
+      renderCustomCategories();
+    });
+    document.getElementById('btn-add-custom-cat').addEventListener('click', addCustomCategory);
+    document.getElementById('manage-cat-type').addEventListener('change', renderCustomCategories);
+    document.getElementById('manage-cat-close').addEventListener('click', () => closeModal('m-manage-cat'));
 
     // Transfer
     document.getElementById('btn-transfer').addEventListener('click', doTransfer);
