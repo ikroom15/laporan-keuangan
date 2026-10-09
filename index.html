@@ -137,7 +137,11 @@
       <div class="sc sc-today"><div class="sl">Pengeluaran Hari Ini</div><div class="sv" id="d-today-out">Rp 0</div></div>
     </div>
     <div class="sg" style="grid-template-columns:1fr;">
-      <div class="sc sc-net"><div class="sl">🧾 Saldo Bersih (Total Saldo − Hutang)</div><div class="sv" id="d-net-balance">Rp 0</div></div>
+      <div class="sc sc-net">
+        <div class="sl">🧾 Saldo Bersih (Total Saldo − Hutang − Tagihan)</div>
+        <div class="sv" id="d-net-balance">Rp 0</div>
+        <div id="d-net-breakdown" style="font-size:11px;opacity:.9;margin-top:6px;"></div>
+      </div>
     </div>
     <div class="card"><div class="sh-title">💰 Saldo Per Akun</div><div id="d-account-balances"></div></div>
     <div class="card"><canvas id="barChart" style="max-height:200px;"></canvas></div>
@@ -507,15 +511,29 @@
     document.getElementById('d-date').textContent = now.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
     const totalBalance = data.accounts.reduce((s,a) => s + getBalance(a.id), 0);
     document.getElementById('d-total-balance').textContent = fRp(totalBalance);
+
     const activeDebt = data.debts.filter(d => d.status === 'Belum Lunas' && d.debtType === 'Saya Berhutang')
                         .reduce((s,d) => s + (d.totalAmount - d.paidAmount), 0);
-    document.getElementById('d-net-balance').textContent = fRp(totalBalance - activeDebt);
+    document.getElementById('d-debt').textContent = fRp(activeDebt);
 
     const m = now.getMonth()+1, y = now.getFullYear();
+
+    // Tagihan aktif bulan ini yang belum dibayar
+    const activeBills = data.bills
+      .filter(b => b.active && !data.billPayments.some(p => p.billId === b.id && p.year === y && p.month === m))
+      .reduce((s,b) => s + b.amount, 0);
+
+    // Saldo bersih = Total Saldo − Hutang Aktif − Tagihan Aktif
+    const netBalance = totalBalance - activeDebt - activeBills;
+    document.getElementById('d-net-balance').textContent = fRp(netBalance);
+    const bd = document.getElementById('d-net-breakdown');
+    if (bd) {
+      bd.textContent = 'Hutang: ' + fRp(activeDebt) + ' · Tagihan: ' + fRp(activeBills);
+    }
+
     const monthTx = data.transactions.filter(t => { const my = getMY(t.date); return my.m === m && my.y === y; });
     document.getElementById('d-income').textContent = fRp(monthTx.filter(t=>t.type==='Pemasukan').reduce((s,t)=>s+t.amount,0));
     document.getElementById('d-expense').textContent = fRp(monthTx.filter(t=>t.type==='Pengeluaran').reduce((s,t)=>s+t.amount,0));
-    document.getElementById('d-debt').textContent = fRp(activeDebt);
 
     const todayStr = today();
     const todayOut = data.transactions.filter(t => t.date === todayStr && t.type === 'Pengeluaran').reduce((s, t) => s + t.amount, 0);
@@ -668,7 +686,6 @@
     if (!date || !from || !to || amount <= 0) { toast('⚠️ Lengkapi semua!', 'err'); return; }
     if (from === to) { toast('⚠️ Akun tidak boleh sama!', 'err'); return; }
     pendingTransfer = { date, from, to, amount, note };
-    // Show summary + fee step
     document.getElementById('fee-summary-box').innerHTML = `
       <div class="row"><span>Dari</span><strong>${getAccountName(from)}</strong></div>
       <div class="row"><span>Ke</span><strong>${getAccountName(to)}</strong></div>
@@ -937,7 +954,6 @@
       createdAt: new Date().toISOString()
     };
 
-    // Only "Saya Menghutangi" deducts balance; "Penitip" doesn't touch balance
     if (debtType === 'Saya Menghutangi' && acc) {
       data.transactions.unshift({
         id: genId(), date: today(), type: 'Pengeluaran',
@@ -997,7 +1013,6 @@
         accountId: acc, createdAt: new Date().toISOString()
       });
     } else {
-      // Both "Saya Menghutangi" and "Penitip" result in money coming in
       const desc = d.debtType === 'Penitip'
         ? 'Uang penitip dari ' + d.name + ' kembali'
         : 'Terima pembayaran piutang dari ' + d.name;
@@ -1332,7 +1347,6 @@
     document.getElementById('tx-view-date').addEventListener('change', function() { renderTxByDate(this.value); });
     document.getElementById('btn-manage-cat').addEventListener('click', function() { openModal('m-manage-cat'); renderCustomCategories(); });
 
-    // Transfer
     document.getElementById('btn-transfer').addEventListener('click', doTransfer);
     document.getElementById('tr-from').addEventListener('change', updateTrBalances);
     document.getElementById('tr-to').addEventListener('change', updateTrBalances);
@@ -1353,7 +1367,6 @@
       closeModal('m-transfer-fee');
     });
 
-    // Tagihan
     document.querySelectorAll('#page-tagihan .tab-btn').forEach(b => {
       b.addEventListener('click', function() {
         document.querySelectorAll('#page-tagihan .tab-btn').forEach(x => x.classList.remove('active'));
@@ -1368,11 +1381,9 @@
     });
     document.getElementById('btn-save-bill').addEventListener('click', saveBill);
 
-    // Riwayat
     ['f-type','f-month','f-search'].forEach(id => document.getElementById(id).addEventListener('input', renderHistory));
     document.getElementById('btn-reset-filter').addEventListener('click', resetFilter);
 
-    // Hutang
     document.querySelectorAll('#page-hutang .tab-btn').forEach(b => {
       b.addEventListener('click', function() {
         document.querySelectorAll('#page-hutang .tab-btn').forEach(x => x.classList.remove('active'));
@@ -1394,7 +1405,6 @@
     document.getElementById('pay-debt-save').addEventListener('click', savePayDebt);
     document.getElementById('pay-debt-cancel').addEventListener('click', () => closeModal('m-pay-debt'));
 
-    // Auto Income
     document.querySelectorAll('#page-autoincome .tab-btn').forEach(b => {
       b.addEventListener('click', function() {
         document.querySelectorAll('#page-autoincome .tab-btn').forEach(x => x.classList.remove('active'));
@@ -1410,12 +1420,10 @@
     });
     document.getElementById('btn-save-ai').addEventListener('click', saveAutoIncome);
 
-    // Laporan
     document.getElementById('rep-month').addEventListener('input', renderReport);
     document.getElementById('btn-export-csv').addEventListener('click', exportCSV);
     document.getElementById('btn-export-pdf').addEventListener('click', exportPDF);
 
-    // Pengaturan
     document.getElementById('btn-add-account').addEventListener('click', function() {
       document.getElementById('acc-edit-id').value = '';
       document.getElementById('acc-name').value = '';
@@ -1486,7 +1494,6 @@
 
     checkAutoIncome();
     showPage('dashboard');
-    // Check bills after short delay so dashboard is loaded first
     setTimeout(checkBills, 800);
     console.log('Keuanganku siap!');
   }
