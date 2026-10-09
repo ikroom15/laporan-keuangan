@@ -15,10 +15,10 @@
     .page { display: none; padding: 16px 16px 100px; max-width: 680px; margin: 0 auto; }
     .page.active { display: block; }
     #bnav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #ddd; display: flex; z-index: 60; }
-    #bnav button { flex: 1; padding: 8px 0; border: none; background: none; font-size: 12px; font-weight: 600; color: #94a3b8; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+    #bnav button { flex: 1; padding: 8px 0; border: none; background: none; font-size: 10px; font-weight: 600; color: #94a3b8; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
     #bnav button.active { color: var(--teal); }
-    #bnav button .ni { font-size: 20px; }
-    #sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 220px; background: #fff; border-right: 1px solid #ddd; padding: 16px; display: none; flex-direction: column; z-index: 40; }
+    #bnav button .ni { font-size: 18px; }
+    #sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 220px; background: #fff; border-right: 1px solid #ddd; padding: 16px; display: none; flex-direction: column; z-index: 40; overflow-y: auto; }
     #sidebar .logo { font-size: 18px; font-weight: 800; color: var(--teal); margin-bottom: 20px; }
     #sidebar .snav { display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 8px; font-weight: 600; color: #6b7280; border: none; background: none; cursor: pointer; width: 100%; font-size: 14px; text-align: left; }
     #sidebar .snav.active { background: #ccfbf1; color: var(--teal); }
@@ -30,6 +30,7 @@
     .sc-in { background: linear-gradient(135deg, #059669, #10b981); }
     .sc-out { background: linear-gradient(135deg, #dc2626, #f87171); }
     .sc-debt { background: linear-gradient(135deg, #d97706, #fbbf24); }
+    .sc-today { background: linear-gradient(135deg, #be123c, #f472b6); }
     .sc-net { background: linear-gradient(135deg, #7c3aed, #8b5cf6); grid-column: 1/-1; }
     .sc .sl { font-size: 10px; font-weight: 700; opacity: .8; text-transform: uppercase; }
     .sc .sv { font-size: 18px; font-weight: 800; word-break: break-word; }
@@ -51,7 +52,7 @@
     .tx-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
     .tx-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
     .tx-icon.in { background: #d1fae5; } .tx-icon.out { background: #fee2e2; }
-    .tx-info { flex: 1; }
+    .tx-info { flex: 1; min-width: 0; }
     .tx-cat { font-weight: 700; font-size: 13px; }
     .tx-desc { font-size: 12px; color: var(--muted); }
     .tx-amt { font-weight: 800; font-size: 14px; flex-shrink: 0; }
@@ -64,6 +65,7 @@
     .b-paid { background: #d1fae5; color: #065f46; }
     .b-active { background: #ccfbf1; color: #0d9488; }
     .b-inactive { background: #f1f5f9; color: #6b7280; }
+    .b-penitip { background: #dbeafe; color: #1e40af; }
     #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px); background: #1f2937; color: #fff; padding: 10px 24px; border-radius: 10px; font-weight: 700; transition: transform .3s; z-index: 999; pointer-events: none; max-width: 90%; }
     #toast.show { transform: translateX(-50%) translateY(0); }
     #toast.ok { background: #059669; }
@@ -77,7 +79,7 @@
     .rp-prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 700; color: #374151; }
     .rp-wrap input { padding-left: 36px; }
     .seg { display: flex; background: #f1f5f9; border-radius: 8px; padding: 3px; gap: 3px; }
-    .seg button { flex: 1; padding: 6px; border: none; background: none; border-radius: 6px; font-weight: 700; color: var(--muted); cursor: pointer; }
+    .seg button { flex: 1; padding: 8px 4px; border: none; background: none; border-radius: 6px; font-weight: 700; color: var(--muted); cursor: pointer; font-size: 11px; line-height: 1.2; }
     .seg button.active { background: #fff; color: var(--teal); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
     .tab-bar { display: flex; background: #f1f5f9; border-radius: 8px; padding: 3px; gap: 3px; margin-bottom: 14px; }
     .tab-btn { flex: 1; padding: 6px; border: none; background: none; border-radius: 6px; font-weight: 700; color: var(--muted); cursor: pointer; }
@@ -86,9 +88,15 @@
     .debt-card { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
     .debt-card.unpaid { border-color: #fde68a; background: #fffbeb; }
     .debt-card.paid { border-color: #a7f3d0; background: #f0fdf4; }
+    .debt-card.penitip { border-color: #bfdbfe; background: #eff6ff; }
     .filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
     .filter-row input, .filter-row select { flex: 1; min-width: 100px; font-size: 13px; padding: 8px; }
     .debt-account-info { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .fee-summary { background: #f0fdf4; border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 13px; }
+    .fee-summary .row { display: flex; justify-content: space-between; padding: 3px 0; }
+    .bill-card { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .bill-card.active { border-color: #a7f3d0; background: #f0fdf4; }
+    .bill-card.paid { border-color: #e5e7eb; background: #f9fafb; opacity: .7; }
   </style>
 </head>
 <body>
@@ -99,6 +107,7 @@
   <button class="snav" data-page="transaksi">➕ Catat</button>
   <button class="snav" data-page="transfer">🔄 Transfer</button>
   <button class="snav" data-page="riwayat">📋 Riwayat</button>
+  <button class="snav" data-page="tagihan">📅 Tagihan</button>
   <button class="snav" data-page="hutang">💸 Hutang</button>
   <button class="snav" data-page="autoincome">🔄 Auto Income</button>
   <button class="snav" data-page="laporan">📊 Laporan</button>
@@ -109,6 +118,7 @@
   <button data-page="dashboard" class="active"><span class="ni">🏠</span>Beranda</button>
   <button data-page="transaksi"><span class="ni">➕</span>Catat</button>
   <button data-page="transfer"><span class="ni">🔄</span>Transfer</button>
+  <button data-page="tagihan"><span class="ni">📅</span>Tagihan</button>
   <button data-page="hutang"><span class="ni">💸</span>Hutang</button>
   <button data-page="pengaturan"><span class="ni">⚙️</span>Lainnya</button>
 </nav>
@@ -124,6 +134,7 @@
       <div class="sc sc-in"><div class="sl">Pemasukan Bulan Ini</div><div class="sv" id="d-income">Rp 0</div></div>
       <div class="sc sc-out"><div class="sl">Pengeluaran Bulan Ini</div><div class="sv" id="d-expense">Rp 0</div></div>
       <div class="sc sc-debt"><div class="sl">Hutang Aktif</div><div class="sv" id="d-debt">Rp 0</div></div>
+      <div class="sc sc-today"><div class="sl">Pengeluaran Hari Ini</div><div class="sv" id="d-today-out">Rp 0</div></div>
     </div>
     <div class="sg" style="grid-template-columns:1fr;">
       <div class="sc sc-net"><div class="sl">🧾 Saldo Bersih (Total Saldo − Hutang)</div><div class="sv" id="d-net-balance">Rp 0</div></div>
@@ -164,13 +175,37 @@
     <div class="ph"><h1>🔄 Transfer</h1></div>
     <div class="card">
       <div class="fg"><label>📅 Tanggal</label><input type="date" id="tr-date"></div>
-      <div class="fg"><label>🏦 Dari</label><select id="tr-from"></select></div>
-      <div class="fg"><label>🏦 Ke</label><select id="tr-to"></select></div>
+      <div class="fg">
+        <label>🏦 Dari</label>
+        <select id="tr-from"></select>
+        <div id="tr-from-bal" style="font-size:12px;font-weight:700;margin-top:5px;color:var(--teal);">💰 Saldo saat ini: Rp 0</div>
+      </div>
+      <div class="fg">
+        <label>🏦 Ke</label>
+        <select id="tr-to"></select>
+        <div id="tr-to-bal" style="font-size:12px;font-weight:700;margin-top:5px;color:var(--teal);">💰 Saldo saat ini: Rp 0</div>
+      </div>
       <div class="fg"><label>💵 Jumlah</label><div class="rp-wrap"><span class="rp-prefix">Rp</span><input type="text" id="tr-amount" inputmode="numeric"></div></div>
       <div class="fg"><label>📝 Catatan</label><input type="text" id="tr-note"></div>
       <button class="btn btn-primary" id="btn-transfer" style="background:#7c3aed;">🔄 TRANSFER</button>
     </div>
     <div class="card"><div class="sh-title">📋 Riwayat Transfer</div><div id="tr-history"></div></div>
+  </div>
+
+  <!-- TAGIHAN -->
+  <div id="page-tagihan" class="page">
+    <div class="ph"><h1>📅 Tagihan Rutin</h1></div>
+    <div class="tab-bar"><button class="tab-btn active" data-tab="list">📋 Daftar</button><button class="tab-btn" data-tab="add">➕ Tambah</button></div>
+    <div id="bill-tab-list"><div id="bill-list"></div></div>
+    <div id="bill-tab-add" style="display:none;">
+      <div class="card">
+        <div class="fg"><label>📌 Nama Tagihan</label><input type="text" id="bill-name" placeholder="Misal: Listrik PLN"></div>
+        <div class="fg"><label>💵 Jumlah</label><div class="rp-wrap"><span class="rp-prefix">Rp</span><input type="text" id="bill-amount" inputmode="numeric"></div></div>
+        <div class="fg"><label>🏷️ Kategori</label><select id="bill-cat"></select></div>
+        <div class="fg"><label>📅 Tanggal Jatuh Tempo (per bulan)</label><select id="bill-day"></select></div>
+        <button class="btn btn-primary" id="btn-save-bill">💾 SIMPAN</button>
+      </div>
+    </div>
   </div>
 
   <!-- RIWAYAT -->
@@ -195,10 +230,17 @@
     <div id="debt-tab-add" style="display:none;">
       <div class="card">
         <div class="fg"><label>👤 Nama</label><input type="text" id="d-name"></div>
-        <div class="fg"><label>Jenis</label><div class="seg" id="debt-type-seg"><button class="active" data-type="Saya Berhutang">😔 Saya Berhutang</button><button data-type="Saya Menghutangi">😊 Saya Menghutangi</button></div></div>
+        <div class="fg"><label>Jenis</label><div class="seg" id="debt-type-seg">
+          <button class="active" data-type="Saya Berhutang">😔 Saya Berhutang</button>
+          <button data-type="Saya Menghutangi">😊 Saya Menghutangi</button>
+          <button data-type="Penitip">🤝 Penitip</button>
+        </div></div>
         <div class="fg"><label>💵 Total</label><div class="rp-wrap"><span class="rp-prefix">Rp</span><input type="text" id="d-total" inputmode="numeric"></div></div>
         <div class="fg"><label>✅ Dibayar</label><div class="rp-wrap"><span class="rp-prefix">Rp</span><input type="text" id="d-paid" inputmode="numeric"></div></div>
         <div class="fg" id="debt-account-group"><label>🏦 Akun Sumber (untuk menghutangi)</label><select id="d-account"></select><span style="font-size:11px;color:var(--muted);">Saldo akan langsung terpotong saat menyimpan</span></div>
+        <div id="debt-penitip-info" style="display:none;background:#eff6ff;border-radius:8px;padding:10px;margin-bottom:14px;font-size:12px;color:#1e40af;">
+          ℹ️ <strong>Penitip</strong> = uang yang dititipkan (tidak memotong saldo kamu). Saat uang kembali/diambil, saldo akan bertambah.
+        </div>
         <div class="fg"><label>📅 Jatuh Tempo</label><input type="date" id="d-due"></div>
         <div class="fg"><label>📝 Catatan</label><textarea id="d-notes" rows="2"></textarea></div>
         <button class="btn btn-primary" id="btn-save-debt">💾 SIMPAN</button>
@@ -281,6 +323,37 @@
   </div>
 </div>
 
+<!-- MODAL BIAYA ADMIN TRANSFER -->
+<div id="m-transfer-fee" class="mo">
+  <div class="mb">
+    <div class="m-title">💸 Konfirmasi Transfer</div>
+    <div id="fee-summary-box" class="fee-summary"></div>
+    <div id="fee-step1">
+      <p style="margin-bottom:12px;font-weight:600;">Apakah ada biaya admin pada transfer ini?</p>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary" style="flex:1;" id="fee-no">Tidak</button>
+        <button class="btn btn-primary" style="flex:1;" id="fee-yes">Ya, Ada</button>
+      </div>
+    </div>
+    <div id="fee-step2" style="display:none;">
+      <div class="fg"><label>💵 Biaya Admin</label><div class="rp-wrap"><span class="rp-prefix">Rp</span><input type="text" id="fee-amount" inputmode="numeric" placeholder="0"></div></div>
+      <div id="fee-preview" style="font-size:12px;color:var(--muted);margin-bottom:12px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary" style="flex:1;" id="fee-back">Kembali</button>
+        <button class="btn btn-primary" style="flex:1;" id="fee-confirm">✅ Konfirmasi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL POPUP TAGIHAN -->
+<div id="m-bill-popup" class="mo">
+  <div class="mb">
+    <div class="m-title" id="bill-popup-title">📅 Tagihan Jatuh Tempo</div>
+    <div id="bill-popup-content"></div>
+  </div>
+</div>
+
 <!-- MODAL KELOLA KATEGORI -->
 <div id="m-manage-cat" class="mo"><div class="mb"><div class="m-title">⚙️ Kelola Kategori</div><div class="fg"><label>Tipe</label><select id="manage-cat-type"><option value="Pemasukan">📈 Pemasukan</option><option value="Pengeluaran">📉 Pengeluaran</option></select></div><div class="fg"><label>Nama Kategori Baru</label><input type="text" id="manage-cat-label" placeholder="Misal: 💰 Royalti"></div><button class="btn btn-primary" id="btn-add-custom-cat" style="background:#7c3aed;">➕ Tambah</button><div class="fg" style="margin-top:12px;"><label>Kategori Kustom</label><div id="custom-cat-list"></div></div><button class="btn btn-secondary" id="manage-cat-close" style="margin-top:8px;">Tutup</button></div></div>
 
@@ -289,13 +362,8 @@
   'use strict';
   const STORAGE_KEY = 'keuanganku_data';
   let data = {
-    transactions: [],
-    debts: [],
-    autoIncomes: [],
-    autoIncomeLog: [],
-    accounts: [],
-    transfers: [],
-    customCategories: []
+    transactions: [], debts: [], autoIncomes: [], autoIncomeLog: [],
+    accounts: [], transfers: [], customCategories: [], bills: [], billPayments: []
   };
 
   const CAT = {
@@ -311,9 +379,7 @@
   };
   const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 
-  function save() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
-  }
+  function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {} }
   function load() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -327,8 +393,11 @@
         if (!data.autoIncomeLog) data.autoIncomeLog = [];
         if (!data.debts) data.debts = [];
         if (!data.transactions) data.transactions = [];
+        if (!data.bills) data.bills = [];
+        if (!data.billPayments) data.billPayments = [];
         data.transactions.forEach(t => t.amount = typeof t.amount === 'number' ? t.amount : 0);
         data.accounts.forEach(a => a.initialBalance = typeof a.initialBalance === 'number' ? a.initialBalance : 0);
+        data.transfers.forEach(t => { t.adminFee = typeof t.adminFee === 'number' ? t.adminFee : 0; });
         data.debts.forEach(d => {
           d.totalAmount = typeof d.totalAmount === 'number' ? d.totalAmount : 0;
           d.paidAmount = typeof d.paidAmount === 'number' ? d.paidAmount : 0;
@@ -347,48 +416,23 @@
   function getBalance(accId) {
     if (balanceCache[accId] !== undefined) return balanceCache[accId];
     let bal = data.accounts.find(a => a.id === accId)?.initialBalance || 0;
-    data.transactions.forEach(t => {
-      if (t.accountId === accId) {
-        bal += t.type === 'Pemasukan' ? t.amount : -t.amount;
-      }
-    });
+    data.transactions.forEach(t => { if (t.accountId === accId) bal += t.type === 'Pemasukan' ? t.amount : -t.amount; });
     data.transfers.forEach(t => {
-      if (t.fromAccountId === accId) bal -= t.amount;
+      if (t.fromAccountId === accId) bal -= t.amount + (t.adminFee || 0);
       if (t.toAccountId === accId) bal += t.amount;
     });
     balanceCache[accId] = bal;
     return bal;
   }
-  function calcBalance(accId) { return getBalance(accId); }
 
-  function genId() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-  }
-  function fRp(n) {
-    return 'Rp ' + Math.round(n).toLocaleString('id-ID');
-  }
-  function pRp(s) {
-    return parseInt(String(s).replace(/[^0-9]/g,'')) || 0;
-  }
-  function today() {
-    return new Date().toISOString().split('T')[0];
-  }
-  function fDate(s) {
-    if (!s) return '-';
-    return new Date(s).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
-  }
-  function getMY(d) {
-    const dt = new Date(d);
-    return { m: dt.getMonth()+1, y: dt.getFullYear() };
-  }
-  function currentMonth() {
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-  }
-  function getAccountName(id) {
-    const a = data.accounts.find(x => x.id === id);
-    return a ? a.name : '?';
-  }
+  function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function fRp(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+  function pRp(s) { return parseInt(String(s).replace(/[^0-9]/g,'')) || 0; }
+  function today() { return new Date().toISOString().split('T')[0]; }
+  function fDate(s) { if (!s) return '-'; return new Date(s).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'}); }
+  function getMY(d) { const dt = new Date(d); return { m: dt.getMonth()+1, y: dt.getFullYear() }; }
+  function currentMonth() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
+  function getAccountName(id) { const a = data.accounts.find(x => x.id === id); return a ? a.name : '?'; }
 
   let toastTimer;
   function toast(msg, type = 'ok') {
@@ -400,17 +444,10 @@
     toastTimer = setTimeout(() => el.className = '', 2500);
   }
 
-  function openModal(id) {
-    const el = document.getElementById(id);
-    if (el) el.classList.add('active');
-  }
-  function closeModal(id) {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('active');
-  }
+  function openModal(id) { const el = document.getElementById(id); if (el) el.classList.add('active'); }
+  function closeModal(id) { const el = document.getElementById(id); if (el) el.classList.remove('active'); }
 
   let currentPage = 'dashboard';
-
   function showPage(page) {
     if (!page) return;
     currentPage = page;
@@ -430,9 +467,7 @@
     const current = el.value;
     el.innerHTML = '<option value="">-- Pilih --</option>';
     if (type && CAT[type]) {
-      CAT[type].forEach(c => {
-        el.innerHTML += `<option value="${c}">${CAT_LABEL[c]}</option>`;
-      });
+      CAT[type].forEach(c => { el.innerHTML += `<option value="${c}">${CAT_LABEL[c]}</option>`; });
       if (data.customCategories.filter(cc => cc.type === type).length) {
         el.innerHTML += `<option disabled>── Kustom ──</option>`;
         data.customCategories.filter(cc => cc.type === type).forEach(cc => {
@@ -461,9 +496,7 @@
     const el = document.getElementById(elId);
     if (!el) return;
     el.innerHTML = '<option value="">-- Pilih --</option>';
-    for (let i = 1; i <= 28; i++) {
-      el.innerHTML += `<option value="${i}">Tanggal ${i}</option>`;
-    }
+    for (let i = 1; i <= 28; i++) el.innerHTML += `<option value="${i}">Tanggal ${i}</option>`;
   }
 
   // ============ DASHBOARD ============
@@ -484,10 +517,13 @@
     document.getElementById('d-expense').textContent = fRp(monthTx.filter(t=>t.type==='Pengeluaran').reduce((s,t)=>s+t.amount,0));
     document.getElementById('d-debt').textContent = fRp(activeDebt);
 
+    const todayStr = today();
+    const todayOut = data.transactions.filter(t => t.date === todayStr && t.type === 'Pengeluaran').reduce((s, t) => s + t.amount, 0);
+    document.getElementById('d-today-out').textContent = fRp(todayOut);
+
     const ab = document.getElementById('d-account-balances');
-    if (data.accounts.length === 0) {
-      ab.innerHTML = '<div class="empty">Belum ada akun</div>';
-    } else {
+    if (data.accounts.length === 0) ab.innerHTML = '<div class="empty">Belum ada akun</div>';
+    else {
       ab.innerHTML = data.accounts.map(a => {
         const bal = getBalance(a.id);
         return `<div class="account-card"><span>${a.type==='cash'?'💵':a.type==='bank'?'🏦':'💳'} ${a.name}</span><strong>${fRp(bal)}</strong></div>`;
@@ -507,19 +543,13 @@
       }
       barChart = new Chart(ctx, {
         type: 'bar',
-        data: {
-          labels,
-          datasets: [
-            { label: 'Pemasukan', data: inc, backgroundColor: 'rgba(16,185,129,.8)', borderRadius: 4 },
-            { label: 'Pengeluaran', data: exp, backgroundColor: 'rgba(248,113,113,.8)', borderRadius: 4 }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
+        data: { labels, datasets: [
+          { label: 'Pemasukan', data: inc, backgroundColor: 'rgba(16,185,129,.8)', borderRadius: 4 },
+          { label: 'Pengeluaran', data: exp, backgroundColor: 'rgba(248,113,113,.8)', borderRadius: 4 }
+        ]},
+        options: { responsive: true, maintainAspectRatio: true,
           plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } },
-          scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
-        }
+          scales: { x: { grid: { display: false } }, y: { beginAtZero: true } } }
       });
     }
   }
@@ -535,14 +565,10 @@
   }
   function setTxType(type) {
     txType = type;
-    document.querySelectorAll('#tx-seg button').forEach(b => {
-      b.classList.toggle('active', b.dataset.type === type);
-    });
+    document.querySelectorAll('#tx-seg button').forEach(b => b.classList.toggle('active', b.dataset.type === type));
     fillCatSelect('tx-cat', type);
     const catEl = document.getElementById('tx-cat');
-    if (catEl && catEl.options.length > 1 && !catEl.value) {
-      catEl.selectedIndex = 1;
-    }
+    if (catEl && catEl.options.length > 1 && !catEl.value) catEl.selectedIndex = 1;
     const btn = document.getElementById('btn-save-tx');
     btn.style.background = type === 'Pemasukan' ? '#059669' : '#dc2626';
   }
@@ -552,26 +578,10 @@
     const amount = pRp(document.getElementById('tx-amount').value);
     const desc = document.getElementById('tx-desc').value.trim();
     const acc = document.getElementById('tx-account').value;
-    if (!date || !cat || amount <= 0 || !acc) {
-      toast('⚠️ Lengkapi semua!', 'err');
-      return;
-    }
-    if (txType === 'Pengeluaran' && getBalance(acc) < amount) {
-      toast('⚠️ Saldo '+getAccountName(acc)+' tidak cukup!', 'err');
-      return;
-    }
-    data.transactions.unshift({
-      id: genId(),
-      date,
-      type: txType,
-      category: cat,
-      amount,
-      description: desc,
-      accountId: acc,
-      createdAt: new Date().toISOString()
-    });
-    save();
-    invalidateBalanceCache();
+    if (!date || !cat || amount <= 0 || !acc) { toast('⚠️ Lengkapi semua!', 'err'); return; }
+    if (txType === 'Pengeluaran' && getBalance(acc) < amount) { toast('⚠️ Saldo '+getAccountName(acc)+' tidak cukup!', 'err'); return; }
+    data.transactions.unshift({ id: genId(), date, type: txType, category: cat, amount, description: desc, accountId: acc, createdAt: new Date().toISOString() });
+    save(); invalidateBalanceCache();
     document.getElementById('tx-amount').value = '';
     document.getElementById('tx-desc').value = '';
     toast('✅ Tersimpan!');
@@ -582,19 +592,13 @@
   function renderTxByDate(date) {
     const list = data.transactions.filter(t => t.date === date);
     const el = document.getElementById('tx-list-by-date');
-    if (list.length === 0) {
-      el.innerHTML = '<div class="empty">Tidak ada transaksi tanggal '+fDate(date)+'</div>';
-      return;
-    }
+    if (list.length === 0) { el.innerHTML = '<div class="empty">Tidak ada transaksi tanggal '+fDate(date)+'</div>'; return; }
     list.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
     el.innerHTML = list.map(t => {
       const isIn = t.type === 'Pemasukan';
       return `<div class="tx-item">
         <div class="tx-icon ${isIn?'in':'out'}">${(getCatLabel(t.category)||'📦').split(' ')[0]}</div>
-        <div class="tx-info">
-          <div class="tx-cat">${getCatLabel(t.category)}</div>
-          <div class="tx-desc">${t.description||''} · ${getAccountName(t.accountId)}</div>
-        </div>
+        <div class="tx-info"><div class="tx-cat">${getCatLabel(t.category)}</div><div class="tx-desc">${t.description||''} · ${getAccountName(t.accountId)}</div></div>
         <div style="display:flex;gap:4px;align-items:center;">
           <div class="tx-amt ${isIn?'in':'out'}">${isIn?'+':'−'}${fRp(t.amount)}</div>
           <button class="btn btn-sm btn-secondary edit-tx-btn" data-id="${t.id}">✏️</button>
@@ -602,25 +606,19 @@
         </div>
       </div>`;
     }).join('');
-    el.querySelectorAll('.edit-tx-btn').forEach(b => b.addEventListener('click', function(e) {
-      e.stopPropagation();
-      openEditTx(this.dataset.id);
-    }));
+    el.querySelectorAll('.edit-tx-btn').forEach(b => b.addEventListener('click', function(e) { e.stopPropagation(); openEditTx(this.dataset.id); }));
     el.querySelectorAll('.del-tx-btn').forEach(b => b.addEventListener('click', function(e) {
       e.stopPropagation();
       if (confirm('Hapus transaksi ini?')) {
         data.transactions = data.transactions.filter(t => t.id !== this.dataset.id);
-        save();
-        invalidateBalanceCache();
+        save(); invalidateBalanceCache();
         toast('🗑️ Dihapus', 'info');
-        renderTxByDate(date);
-        renderDashboard();
+        renderTxByDate(date); renderDashboard();
       }
     }));
   }
   function openEditTx(id) {
-    const t = data.transactions.find(x => x.id === id);
-    if (!t) return;
+    const t = data.transactions.find(x => x.id === id); if (!t) return;
     document.getElementById('et-id').value = id;
     document.getElementById('et-date').value = t.date;
     document.getElementById('et-amount').value = t.amount.toLocaleString('id-ID');
@@ -632,27 +630,34 @@
   }
   function saveEditTx() {
     const id = document.getElementById('et-id').value;
-    const t = data.transactions.find(x => x.id === id);
-    if (!t) return;
+    const t = data.transactions.find(x => x.id === id); if (!t) return;
     t.date = document.getElementById('et-date').value;
     t.category = document.getElementById('et-cat').value;
     t.amount = pRp(document.getElementById('et-amount').value);
     t.description = document.getElementById('et-desc').value.trim();
     t.accountId = document.getElementById('et-account').value;
-    save();
-    invalidateBalanceCache();
-    closeModal('m-edit-tx');
+    save(); invalidateBalanceCache(); closeModal('m-edit-tx');
     toast('✅ Diupdate!');
     const viewDate = document.getElementById('tx-view-date').value;
-    renderTxByDate(viewDate || today());
-    renderDashboard();
+    renderTxByDate(viewDate || today()); renderDashboard();
   }
 
   // ============ TRANSFER ============
+  let pendingTransfer = null;
+  function updateTrBalances() {
+    const from = document.getElementById('tr-from').value;
+    const to = document.getElementById('tr-to').value;
+    const fromEl = document.getElementById('tr-from-bal');
+    const toEl = document.getElementById('tr-to-bal');
+    if (from) { const bal = getBalance(from); fromEl.textContent = '💰 Saldo saat ini: ' + fRp(bal); fromEl.style.color = bal < 0 ? 'var(--red)' : 'var(--teal)'; }
+    else fromEl.textContent = '';
+    if (to) { const bal = getBalance(to); toEl.textContent = '💰 Saldo saat ini: ' + fRp(bal); toEl.style.color = bal < 0 ? 'var(--red)' : 'var(--teal)'; }
+    else toEl.textContent = '';
+  }
   function setupTransferForm() {
     document.getElementById('tr-date').value = today();
-    fillAccountSelect('tr-from');
-    fillAccountSelect('tr-to');
+    fillAccountSelect('tr-from'); fillAccountSelect('tr-to');
+    updateTrBalances();
   }
   function doTransfer() {
     const date = document.getElementById('tr-date').value;
@@ -660,50 +665,182 @@
     const to = document.getElementById('tr-to').value;
     const amount = pRp(document.getElementById('tr-amount').value);
     const note = document.getElementById('tr-note').value.trim();
-    if (!date || !from || !to || amount <= 0) {
-      toast('⚠️ Lengkapi semua!', 'err');
+    if (!date || !from || !to || amount <= 0) { toast('⚠️ Lengkapi semua!', 'err'); return; }
+    if (from === to) { toast('⚠️ Akun tidak boleh sama!', 'err'); return; }
+    pendingTransfer = { date, from, to, amount, note };
+    // Show summary + fee step
+    document.getElementById('fee-summary-box').innerHTML = `
+      <div class="row"><span>Dari</span><strong>${getAccountName(from)}</strong></div>
+      <div class="row"><span>Ke</span><strong>${getAccountName(to)}</strong></div>
+      <div class="row"><span>Jumlah</span><strong>${fRp(amount)}</strong></div>
+    `;
+    document.getElementById('fee-step1').style.display = 'block';
+    document.getElementById('fee-step2').style.display = 'none';
+    document.getElementById('fee-amount').value = '';
+    openModal('m-transfer-fee');
+  }
+  function updateFeePreview() {
+    if (!pendingTransfer) return;
+    const fee = pRp(document.getElementById('fee-amount').value);
+    const newBal = getBalance(pendingTransfer.from) - pendingTransfer.amount - fee;
+    document.getElementById('fee-preview').innerHTML =
+      `Total terpotong dari <strong>${getAccountName(pendingTransfer.from)}</strong>: <strong>${fRp(pendingTransfer.amount + fee)}</strong><br>` +
+      `Saldo setelah transfer: <strong style="color:${newBal<0?'var(--red)':'var(--green)'}">${fRp(newBal)}</strong>`;
+  }
+  function processTransfer(adminFee) {
+    if (!pendingTransfer) return;
+    const { date, from, to, amount, note } = pendingTransfer;
+    const total = amount + adminFee;
+    if (getBalance(from) < total) {
+      toast('⚠️ Saldo tidak cukup! Butuh '+fRp(total), 'err');
       return;
     }
-    if (from === to) {
-      toast('⚠️ Akun tidak boleh sama!', 'err');
-      return;
-    }
-    if (getBalance(from) < amount) {
-      toast('⚠️ Saldo '+getAccountName(from)+' tidak cukup!', 'err');
-      return;
-    }
-    data.transfers.push({ id: genId(), date, fromAccountId: from, toAccountId: to, amount, note, createdAt: new Date().toISOString() });
-    save();
-    invalidateBalanceCache();
+    data.transfers.push({ id: genId(), date, fromAccountId: from, toAccountId: to, amount, adminFee, note, createdAt: new Date().toISOString() });
+    save(); invalidateBalanceCache(); updateTrBalances();
     document.getElementById('tr-amount').value = '';
     document.getElementById('tr-note').value = '';
-    toast('✅ Transfer berhasil!');
-    renderTransferHistory();
-    renderDashboard();
+    pendingTransfer = null;
+    toast('✅ Transfer berhasil!' + (adminFee > 0 ? ' (Biaya admin ' + fRp(adminFee) + ')' : ''));
+    renderTransferHistory(); renderDashboard();
   }
   function renderTransferHistory() {
     const el = document.getElementById('tr-history');
-    if (data.transfers.length === 0) {
-      el.innerHTML = '<div class="empty">Belum ada transfer</div>';
-      return;
-    }
+    if (data.transfers.length === 0) { el.innerHTML = '<div class="empty">Belum ada transfer</div>'; return; }
     el.innerHTML = [...data.transfers].reverse().map(t => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9;">
-        <div><strong>🔄 ${getAccountName(t.fromAccountId)} → ${getAccountName(t.toAccountId)}</strong><br><small>${fDate(t.date)} ${t.note||''}</small></div>
-        <div style="font-weight:800;color:#7c3aed;">${fRp(t.amount)}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9;gap:8px;">
+        <div style="flex:1;min-width:0;">
+          <strong>🔄 ${getAccountName(t.fromAccountId)} → ${getAccountName(t.toAccountId)}</strong><br>
+          <small style="color:var(--muted);">${fDate(t.date)} ${t.note||''}${t.adminFee > 0 ? ' · Biaya admin: '+fRp(t.adminFee) : ''}</small>
+        </div>
+        <div style="font-weight:800;color:#7c3aed;white-space:nowrap;">${fRp(t.amount)}</div>
         <button class="btn btn-sm btn-danger del-transfer" data-id="${t.id}">🗑️</button>
       </div>
     `).join('');
     el.querySelectorAll('.del-transfer').forEach(b => b.addEventListener('click', function() {
       if (confirm('Hapus transfer ini?')) {
         data.transfers = data.transfers.filter(t => t.id !== this.dataset.id);
-        save();
-        invalidateBalanceCache();
-        renderTransferHistory();
-        renderDashboard();
+        save(); invalidateBalanceCache();
+        renderTransferHistory(); renderDashboard();
         toast('🗑️ Dihapus', 'info');
       }
     }));
+  }
+
+  // ============ TAGIHAN ============
+  let billQueue = [];
+  function checkBills() {
+    const now = new Date();
+    const day = now.getDate();
+    const month = now.getMonth()+1;
+    const year = now.getFullYear();
+    billQueue = data.bills.filter(b =>
+      b.active && b.dayOfMonth <= day &&
+      !data.billPayments.some(p => p.billId === b.id && p.year === year && p.month === month)
+    );
+    if (billQueue.length > 0) showNextBill();
+  }
+  function showNextBill() {
+    if (billQueue.length === 0) { closeModal('m-bill-popup'); return; }
+    const b = billQueue[0];
+    const now = new Date();
+    document.getElementById('bill-popup-title').textContent = '📅 Tagihan: ' + b.name;
+    document.getElementById('bill-popup-content').innerHTML = `
+      <div style="background:#fef3c7;border-radius:8px;padding:12px;margin-bottom:12px;">
+        <div style="font-size:12px;color:#92400e;font-weight:700;">JUMLAH TAGIHAN</div>
+        <div style="font-size:22px;font-weight:800;color:#92400e;">${fRp(b.amount)}</div>
+        <div style="font-size:12px;color:#92400e;margin-top:4px;">Jatuh tempo tanggal ${b.dayOfMonth} · ${getCatLabel(b.category)}</div>
+      </div>
+      <p style="margin-bottom:12px;font-weight:600;">Apakah tagihan ini sudah dibayar?</p>
+      <div id="bill-ask-step" style="display:flex;gap:8px;">
+        <button class="btn btn-secondary" style="flex:1;" id="bill-no-btn">Belum</button>
+        <button class="btn btn-primary" style="flex:1;background:#059669;" id="bill-yes-btn">✅ Sudah Bayar</button>
+      </div>
+      <div id="bill-account-step" style="display:none;">
+        <div class="fg"><label>🏦 Bayar dari akun</label><select id="bill-account-pick"></select></div>
+        <div id="bill-bal-info" style="font-size:12px;color:var(--muted);margin-bottom:10px;"></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary" style="flex:1;" id="bill-cancel-btn">Batal</button>
+          <button class="btn btn-primary" style="flex:1;" id="bill-pay-confirm">💾 Konfirmasi</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('bill-no-btn').onclick = () => { billQueue.shift(); showNextBill(); };
+    document.getElementById('bill-cancel-btn').onclick = () => {
+      document.getElementById('bill-account-step').style.display = 'none';
+      document.getElementById('bill-ask-step').style.display = 'flex';
+    };
+    document.getElementById('bill-yes-btn').onclick = () => {
+      document.getElementById('bill-ask-step').style.display = 'none';
+      document.getElementById('bill-account-step').style.display = 'block';
+      fillAccountSelect('bill-account-pick');
+      const sel = document.getElementById('bill-account-pick');
+      const updateInfo = () => {
+        const accId = sel.value;
+        if (!accId) { document.getElementById('bill-bal-info').textContent = ''; return; }
+        const bal = getBalance(accId);
+        const after = bal - b.amount;
+        document.getElementById('bill-bal-info').innerHTML = `Saldo: <strong>${fRp(bal)}</strong> → setelah bayar: <strong style="color:${after<0?'var(--red)':'var(--green)'}">${fRp(after)}</strong>`;
+      };
+      sel.onchange = updateInfo;
+      updateInfo();
+    };
+    document.getElementById('bill-pay-confirm').onclick = () => {
+      const acc = document.getElementById('bill-account-pick').value;
+      if (!acc) { toast('⚠️ Pilih akun!', 'err'); return; }
+      if (getBalance(acc) < b.amount) { toast('⚠️ Saldo tidak cukup!', 'err'); return; }
+      data.transactions.unshift({
+        id: genId(), date: today(), type: 'Pengeluaran',
+        category: b.category, amount: b.amount,
+        description: 'Bayar tagihan: ' + b.name,
+        accountId: acc, createdAt: new Date().toISOString()
+      });
+      data.billPayments.push({ billId: b.id, year: now.getFullYear(), month: now.getMonth()+1, date: today(), accountId: acc, amount: b.amount });
+      save(); invalidateBalanceCache();
+      toast('✅ Tagihan dibayar!');
+      billQueue.shift();
+      showNextBill();
+      renderDashboard(); renderBillList();
+    };
+    openModal('m-bill-popup');
+  }
+  function renderBillList() {
+    const el = document.getElementById('bill-list');
+    if (data.bills.length === 0) { el.innerHTML = '<div class="empty">Belum ada tagihan</div>'; return; }
+    const now = new Date();
+    const month = now.getMonth()+1, year = now.getFullYear();
+    el.innerHTML = data.bills.map(b => {
+      const paid = data.billPayments.some(p => p.billId === b.id && p.year === year && p.month === month);
+      return `<div class="bill-card ${paid?'paid':'active'}">
+        <div style="display:flex;justify-content:space-between;">
+          <div><strong>📅 ${b.name}</strong></div>
+          <span class="badge ${paid?'b-paid':'b-debt'}">${paid?'✅ Sudah dibayar':'⏳ Belum dibayar'}</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">${fRp(b.amount)} · Jatuh tempo tanggal ${b.dayOfMonth} · ${getCatLabel(b.category)}</div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button class="btn btn-sm btn-danger del-bill" data-id="${b.id}">🗑️ Hapus</button>
+        </div>
+      </div>`;
+    }).join('');
+    el.querySelectorAll('.del-bill').forEach(btn => btn.addEventListener('click', function() {
+      if (confirm('Hapus tagihan ini?')) {
+        data.bills = data.bills.filter(x => x.id !== this.dataset.id);
+        save(); renderBillList();
+        toast('🗑️ Dihapus', 'info');
+      }
+    }));
+  }
+  function saveBill() {
+    const name = document.getElementById('bill-name').value.trim();
+    const amount = pRp(document.getElementById('bill-amount').value);
+    const cat = document.getElementById('bill-cat').value;
+    const day = document.getElementById('bill-day').value;
+    if (!name || amount <= 0 || !cat || !day) { toast('⚠️ Lengkapi semua!', 'err'); return; }
+    data.bills.push({ id: genId(), name, amount, category: cat, dayOfMonth: parseInt(day), active: true });
+    save();
+    document.getElementById('bill-name').value = '';
+    document.getElementById('bill-amount').value = '';
+    toast('✅ Tagihan ditambahkan!');
+    renderBillList();
   }
 
   // ============ RIWAYAT ============
@@ -718,38 +855,24 @@
       list = list.filter(t => { const my = getMY(t.date); return my.m === m && my.y === y; });
     }
     if (search) {
-      list = list.filter(t => {
-        const match = (t.description||'').toLowerCase().includes(search) ||
-                      getCatLabel(t.category).toLowerCase().includes(search) ||
-                      getAccountName(t.accountId).toLowerCase().includes(search) ||
-                      fRp(t.amount).toLowerCase().includes(search) ||
-                      t.type.toLowerCase().includes(search);
-        return match;
-      });
+      list = list.filter(t => (t.description||'').toLowerCase().includes(search) ||
+        getCatLabel(t.category).toLowerCase().includes(search) ||
+        getAccountName(t.accountId).toLowerCase().includes(search) ||
+        fRp(t.amount).toLowerCase().includes(search) || t.type.toLowerCase().includes(search));
     }
     const el = document.getElementById('h-list');
-    if (list.length === 0) {
-      el.innerHTML = '<div class="empty">Tidak ada transaksi</div>';
-      return;
-    }
+    if (list.length === 0) { el.innerHTML = '<div class="empty">Tidak ada transaksi</div>'; return; }
     el.innerHTML = list.map(t => {
       const isIn = t.type === 'Pemasukan';
       return `<div class="tx-item">
         <div class="tx-icon ${isIn?'in':'out'}">${(getCatLabel(t.category)||'📦').split(' ')[0]}</div>
-        <div class="tx-info">
-          <div class="tx-cat">${getCatLabel(t.category)}</div>
-          <div class="tx-desc">${t.description||''} · ${getAccountName(t.accountId)}</div>
-          <div class="tx-date">${fDate(t.date)}</div>
-        </div>
+        <div class="tx-info"><div class="tx-cat">${getCatLabel(t.category)}</div><div class="tx-desc">${t.description||''} · ${getAccountName(t.accountId)}</div><div class="tx-date" style="font-size:11px;color:var(--muted);">${fDate(t.date)}</div></div>
         <div class="tx-amt ${isIn?'in':'out'}">${isIn?'+':'−'}${fRp(t.amount)}</div>
       </div>`;
     }).join('');
   }
   function resetFilter() {
-    ['f-type','f-month','f-search'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
+    ['f-type','f-month','f-search'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     renderHistory();
   }
 
@@ -757,37 +880,33 @@
   let debtType = 'Saya Berhutang';
   function renderDebtList() {
     const el = document.getElementById('debt-list');
-    if (data.debts.length === 0) {
-      el.innerHTML = '<div class="empty">Belum ada hutang</div>';
-      return;
-    }
+    if (data.debts.length === 0) { el.innerHTML = '<div class="empty">Belum ada hutang</div>'; return; }
     el.innerHTML = data.debts.map(d => {
       const rem = d.totalAmount - d.paidAmount;
       const paid = d.status === 'Lunas';
       const isOwe = d.debtType === 'Saya Berhutang';
-      return `<div class="debt-card ${paid?'paid':'unpaid'}">
+      const isPenitip = d.debtType === 'Penitip';
+      const cardClass = paid ? 'paid' : (isPenitip ? 'penitip' : 'unpaid');
+      const badgeClass = isPenitip ? 'b-penitip' : (isOwe ? 'b-out' : 'b-in');
+      return `<div class="debt-card ${cardClass}">
         <div style="display:flex;justify-content:space-between;">
-          <div><strong>${d.name}</strong> <span class="badge ${isOwe?'b-out':'b-in'}">${d.debtType}</span></div>
+          <div><strong>${d.name}</strong> <span class="badge ${badgeClass}">${d.debtType}</span></div>
           <span class="badge ${paid?'b-paid':'b-debt'}">${paid?'✅ Lunas':'⏳ Belum'}</span>
         </div>
         <div style="font-size:13px;color:var(--muted);">Total: ${fRp(d.totalAmount)} · Dibayar: ${fRp(d.paidAmount)} · Sisa: ${fRp(rem)}</div>
         ${d.dueDate ? `<div style="font-size:12px;color:var(--muted);">📅 Jatuh tempo: ${fDate(d.dueDate)}</div>` : ''}
-        ${!isOwe && d.accountId ? `<div class="debt-account-info">🏦 Akun sumber: ${getAccountName(d.accountId)}</div>` : ''}
+        ${d.debtType === 'Saya Menghutangi' && d.accountId ? `<div class="debt-account-info">🏦 Akun sumber: ${getAccountName(d.accountId)}</div>` : ''}
         <div style="display:flex;gap:6px;margin-top:6px;">
-          ${!paid ? `<button class="btn btn-sm btn-success pay-debt-btn" data-id="${d.id}">💳 ${isOwe ? 'Bayar' : 'Terima Pembayaran'}</button>` : ''}
+          ${!paid ? `<button class="btn btn-sm btn-success pay-debt-btn" data-id="${d.id}">💳 ${isOwe ? 'Bayar' : (isPenitip ? 'Uang Kembali' : 'Terima Pembayaran')}</button>` : ''}
           <button class="btn btn-sm btn-danger del-debt-btn" data-id="${d.id}">🗑️</button>
         </div>
       </div>`;
     }).join('');
-    el.querySelectorAll('.pay-debt-btn').forEach(b => b.addEventListener('click', function() {
-      openPayDebt(this.dataset.id);
-    }));
+    el.querySelectorAll('.pay-debt-btn').forEach(b => b.addEventListener('click', function() { openPayDebt(this.dataset.id); }));
     el.querySelectorAll('.del-debt-btn').forEach(b => b.addEventListener('click', function() {
       if (confirm('Hapus hutang ini?')) {
         data.debts = data.debts.filter(d => d.id !== this.dataset.id);
-        save();
-        renderDebtList();
-        renderDashboard();
+        save(); renderDebtList(); renderDashboard();
         toast('🗑️ Dihapus', 'info');
       }
     }));
@@ -800,74 +919,57 @@
     const due = document.getElementById('d-due').value;
     const notes = document.getElementById('d-notes').value.trim();
     const acc = document.getElementById('d-account').value;
-    if (!name || total <= 0) {
-      toast('⚠️ Nama & total wajib!', 'err');
-      return;
-    }
-    
+    if (!name || total <= 0) { toast('⚠️ Nama & total wajib!', 'err'); return; }
+
     if (debtType === 'Saya Menghutangi') {
-      if (!acc) {
-        toast('⚠️ Pilih akun sumber untuk menghutangi!', 'err');
-        return;
-      }
-      if (getBalance(acc) < total) {
-        toast('⚠️ Saldo '+getAccountName(acc)+' tidak cukup untuk menghutangi!', 'err');
-        return;
-      }
+      if (!acc) { toast('⚠️ Pilih akun sumber!', 'err'); return; }
+      if (getBalance(acc) < total) { toast('⚠️ Saldo tidak cukup!', 'err'); return; }
     }
-    
+
     const debt = {
-      id: genId(),
-      name,
-      debtType,
+      id: genId(), name, debtType,
       totalAmount: total,
       paidAmount: Math.min(paid, total),
       dueDate: due,
       status: paid >= total ? 'Lunas' : 'Belum Lunas',
       notes,
-      accountId: acc || '',
+      accountId: (debtType === 'Saya Menghutangi') ? acc : '',
       createdAt: new Date().toISOString()
     };
-    
+
+    // Only "Saya Menghutangi" deducts balance; "Penitip" doesn't touch balance
     if (debtType === 'Saya Menghutangi' && acc) {
       data.transactions.unshift({
-        id: genId(),
-        date: today(),
-        type: 'Pengeluaran',
-        category: 'lain_out',
-        amount: total,
+        id: genId(), date: today(), type: 'Pengeluaran',
+        category: 'lain_out', amount: total,
         description: 'Memberi hutang ke ' + name,
-        accountId: acc,
-        createdAt: new Date().toISOString()
+        accountId: acc, createdAt: new Date().toISOString()
       });
     }
-    
+
     data.debts.push(debt);
-    save();
-    invalidateBalanceCache();
+    save(); invalidateBalanceCache();
     document.getElementById('d-name').value = '';
     document.getElementById('d-total').value = '';
     document.getElementById('d-paid').value = '';
     document.getElementById('d-due').value = '';
     document.getElementById('d-notes').value = '';
-    toast('✅ Hutang tersimpan!');
-    renderDebtList();
-    renderDashboard();
+    toast('✅ Tersimpan!');
+    renderDebtList(); renderDashboard();
   }
 
   function openPayDebt(id) {
-    const d = data.debts.find(x => x.id === id);
-    if (!d) return;
+    const d = data.debts.find(x => x.id === id); if (!d) return;
     document.getElementById('pay-debt-id').value = id;
     document.getElementById('pay-debt-total').textContent = fRp(d.totalAmount);
     document.getElementById('pay-debt-prev').textContent = fRp(d.paidAmount);
     document.getElementById('pay-debt-sisa').textContent = fRp(d.totalAmount - d.paidAmount);
     document.getElementById('pay-debt-amount').value = '';
-    // set placeholder sisa
     document.getElementById('pay-debt-amount').placeholder = 'Maksimal ' + fRp(d.totalAmount - d.paidAmount);
     fillAccountSelect('pay-debt-account');
     const isOwe = d.debtType === 'Saya Berhutang';
-    document.getElementById('pay-debt-title').textContent = isOwe ? '💳 Bayar Hutang' : '💳 Terima Pembayaran Piutang';
+    const isPenitip = d.debtType === 'Penitip';
+    document.getElementById('pay-debt-title').textContent = isOwe ? '💳 Bayar Hutang' : (isPenitip ? '🤝 Uang Penitip Kembali' : '💳 Terima Pembayaran Piutang');
     const labelEl = document.querySelector('#m-pay-debt .fg label');
     if (labelEl) labelEl.textContent = isOwe ? '🏦 Dari Akun' : '🏦 Ke Akun';
     openModal('m-pay-debt');
@@ -875,66 +977,42 @@
 
   function savePayDebt() {
     const id = document.getElementById('pay-debt-id').value;
-    const d = data.debts.find(x => x.id === id);
-    if (!d) return;
+    const d = data.debts.find(x => x.id === id); if (!d) return;
     const isOwe = d.debtType === 'Saya Berhutang';
     let add = pRp(document.getElementById('pay-debt-amount').value);
     const acc = document.getElementById('pay-debt-account').value;
     const sisa = d.totalAmount - d.paidAmount;
-    
-    if (add <= 0) {
-      toast('⚠️ Masukkan jumlah pembayaran!', 'err');
-      return;
-    }
-    if (!acc) {
-      toast('⚠️ Pilih akun!', 'err');
-      return;
-    }
-    
-    // Batasi jumlah bayar maksimal = sisa hutang
-    if (add > sisa) {
-      add = sisa;
-      toast('💡 Jumlah dibatasi maksimal sisa hutang ('+fRp(sisa)+')', 'info');
-    }
-    
-    // Cek saldo untuk pembayaran hutang (Saya Berhutang)
-    if (isOwe && getBalance(acc) < add) {
-      toast('⚠️ Saldo '+getAccountName(acc)+' tidak cukup!', 'err');
-      return;
-    }
-    
-    // Proses pembayaran (selalu <= sisa)
+
+    if (add <= 0) { toast('⚠️ Masukkan jumlah!', 'err'); return; }
+    if (!acc) { toast('⚠️ Pilih akun!', 'err'); return; }
+    if (add > sisa) { add = sisa; toast('💡 Dibatasi maksimal sisa ('+fRp(sisa)+')', 'info'); }
+
+    if (isOwe && getBalance(acc) < add) { toast('⚠️ Saldo tidak cukup!', 'err'); return; }
+
     if (isOwe) {
       data.transactions.unshift({
-        id: genId(),
-        date: today(),
-        type: 'Pengeluaran',
-        category: 'cicilan',
-        amount: add,
+        id: genId(), date: today(), type: 'Pengeluaran',
+        category: 'cicilan', amount: add,
         description: 'Bayar hutang ke ' + d.name,
-        accountId: acc,
-        createdAt: new Date().toISOString()
+        accountId: acc, createdAt: new Date().toISOString()
       });
     } else {
+      // Both "Saya Menghutangi" and "Penitip" result in money coming in
+      const desc = d.debtType === 'Penitip'
+        ? 'Uang penitip dari ' + d.name + ' kembali'
+        : 'Terima pembayaran piutang dari ' + d.name;
       data.transactions.unshift({
-        id: genId(),
-        date: today(),
-        type: 'Pemasukan',
-        category: 'kembali',
-        amount: add,
-        description: 'Terima pembayaran piutang dari ' + d.name,
-        accountId: acc,
-        createdAt: new Date().toISOString()
+        id: genId(), date: today(), type: 'Pemasukan',
+        category: 'kembali', amount: add,
+        description: desc,
+        accountId: acc, createdAt: new Date().toISOString()
       });
     }
     d.paidAmount += add;
     d.status = d.paidAmount >= d.totalAmount ? 'Lunas' : 'Belum Lunas';
-    save();
-    invalidateBalanceCache();
-    closeModal('m-pay-debt');
-    toast('✅ Pembayaran dicatat!');
-    renderDebtList();
-    renderDashboard();
+    save(); invalidateBalanceCache(); closeModal('m-pay-debt');
+    toast('✅ Tercatat!');
+    renderDebtList(); renderDashboard();
   }
 
   // ============ AUTO INCOME ============
@@ -949,31 +1027,22 @@
       const logged = data.autoIncomeLog.some(l => l.aiId === ai.id && l.year === year && l.month === month);
       if (logged) return;
       data.transactions.unshift({
-        id: genId(),
-        date: today(),
-        type: 'Pemasukan',
-        category: ai.category,
-        amount: ai.amount,
+        id: genId(), date: today(), type: 'Pemasukan',
+        category: ai.category, amount: ai.amount,
         description: ai.name + ' (Otomatis)',
-        accountId: ai.accountId,
-        createdAt: new Date().toISOString()
+        accountId: ai.accountId, createdAt: new Date().toISOString()
       });
       data.autoIncomeLog.push({ aiId: ai.id, year, month, date: today() });
     });
     if (data.autoIncomes.some(ai => ai.active && ai.dayOfMonth === day)) {
-      save();
-      invalidateBalanceCache();
+      save(); invalidateBalanceCache();
       toast('🔄 Auto income hari ini ditambahkan!', 'info');
       renderDashboard();
     }
   }
-
   function renderAutoIncome() {
     const el = document.getElementById('ai-list');
-    if (data.autoIncomes.length === 0) {
-      el.innerHTML = '<div class="empty">Belum ada</div>';
-      return;
-    }
+    if (data.autoIncomes.length === 0) { el.innerHTML = '<div class="empty">Belum ada</div>'; return; }
     el.innerHTML = data.autoIncomes.map(ai => `
       <div style="border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;">
         <div style="display:flex;justify-content:space-between;">
@@ -987,8 +1056,7 @@
     el.querySelectorAll('.del-ai').forEach(b => b.addEventListener('click', function() {
       if (confirm('Hapus auto income?')) {
         data.autoIncomes = data.autoIncomes.filter(a => a.id !== this.dataset.id);
-        save();
-        renderAutoIncome();
+        save(); renderAutoIncome();
         toast('🗑️ Dihapus', 'info');
       }
     }));
@@ -999,19 +1067,8 @@
     const cat = document.getElementById('ai-cat').value;
     const day = document.getElementById('ai-day').value;
     const acc = document.getElementById('ai-account').value;
-    if (!name || amount <= 0 || !cat || !day || !acc) {
-      toast('⚠️ Lengkapi semua!', 'err');
-      return;
-    }
-    data.autoIncomes.push({
-      id: genId(),
-      name,
-      amount,
-      category: cat,
-      dayOfMonth: parseInt(day),
-      active: true,
-      accountId: acc
-    });
+    if (!name || amount <= 0 || !cat || !day || !acc) { toast('⚠️ Lengkapi semua!', 'err'); return; }
+    data.autoIncomes.push({ id: genId(), name, amount, category: cat, dayOfMonth: parseInt(day), active: true, accountId: acc });
     save();
     document.getElementById('ai-name').value = '';
     document.getElementById('ai-amount').value = '';
@@ -1028,10 +1085,7 @@
     const totOut = tx.filter(t=>t.type==='Pengeluaran').reduce((s,t)=>s+t.amount,0);
     const sel = totIn - totOut;
     const el = document.getElementById('rep-content');
-    if (tx.length === 0) {
-      el.innerHTML = '<div class="empty">Tidak ada transaksi bulan ini</div>';
-      return;
-    }
+    if (tx.length === 0) { el.innerHTML = '<div class="empty">Tidak ada transaksi bulan ini</div>'; return; }
     el.innerHTML = `
       <div class="card">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
@@ -1046,7 +1100,7 @@
       </div>
       <div class="card"><div class="sh-title">📋 Daftar</div>${tx.sort((a,b)=>b.date.localeCompare(a.date)).map(t => {
         const isIn = t.type === 'Pemasukan';
-        return `<div class="tx-item"><div class="tx-icon ${isIn?'in':'out'}">${(getCatLabel(t.category)||'📦').split(' ')[0]}</div><div class="tx-info"><div class="tx-cat">${getCatLabel(t.category)}</div><div class="tx-desc">${t.description||''} · ${getAccountName(t.accountId)}</div><div class="tx-date">${fDate(t.date)}</div></div><div class="tx-amt ${isIn?'in':'out'}">${isIn?'+':'−'}${fRp(t.amount)}</div></div>`;
+        return `<div class="tx-item"><div class="tx-icon ${isIn?'in':'out'}">${(getCatLabel(t.category)||'📦').split(' ')[0]}</div><div class="tx-info"><div class="tx-cat">${getCatLabel(t.category)}</div><div class="tx-desc">${t.description||''} · ${getAccountName(t.accountId)}</div><div style="font-size:11px;color:var(--muted);">${fDate(t.date)}</div></div><div class="tx-amt ${isIn?'in':'out'}">${isIn?'+':'−'}${fRp(t.amount)}</div></div>`;
       }).join('')}</div>
     `;
   }
@@ -1054,10 +1108,7 @@
   // ============ PENGATURAN ============
   function renderAccounts() {
     const el = document.getElementById('account-list');
-    if (data.accounts.length === 0) {
-      el.innerHTML = '<div class="empty">Belum ada akun</div>';
-      return;
-    }
+    if (data.accounts.length === 0) { el.innerHTML = '<div class="empty">Belum ada akun</div>'; return; }
     el.innerHTML = data.accounts.map(a => {
       const bal = getBalance(a.id);
       return `<div class="account-card">
@@ -1076,10 +1127,7 @@
       });
       data.autoIncomes.forEach(ai => { if (ai.accountId === this.dataset.id) ai.accountId = tunai.id; });
       data.accounts = data.accounts.filter(a => a.id !== this.dataset.id);
-      save();
-      invalidateBalanceCache();
-      renderAccounts();
-      renderDashboard();
+      save(); invalidateBalanceCache(); renderAccounts(); renderDashboard();
       toast('✅ Akun dihapus, data dipindah ke Tunai');
     }));
   }
@@ -1088,14 +1136,8 @@
     const name = document.getElementById('acc-name').value.trim();
     const type = document.getElementById('acc-type').value;
     const bal = pRp(document.getElementById('acc-balance').value);
-    if (!name) {
-      toast('⚠️ Nama wajib!', 'err');
-      return;
-    }
-    if (data.accounts.find(a => a.name === name && a.id !== id)) {
-      toast('⚠️ Nama sudah ada!', 'err');
-      return;
-    }
+    if (!name) { toast('⚠️ Nama wajib!', 'err'); return; }
+    if (data.accounts.find(a => a.name === name && a.id !== id)) { toast('⚠️ Nama sudah ada!', 'err'); return; }
     if (id) {
       const acc = data.accounts.find(a => a.id === id);
       if (acc) { acc.name = name; acc.type = type; acc.initialBalance = bal; }
@@ -1104,14 +1146,12 @@
       data.accounts.push({ id: genId(), name, type, initialBalance: bal });
       toast('✅ Akun ditambahkan!');
     }
-    save();
-    invalidateBalanceCache();
-    closeModal('m-account');
+    save(); invalidateBalanceCache(); closeModal('m-account');
     renderAccounts();
     ['tx-account','tr-from','tr-to','ai-account','pay-debt-account','d-account','et-account'].forEach(id => fillAccountSelect(id));
+    updateTrBalances();
     renderDashboard();
   }
-
   function renderSettings() {
     const el = document.getElementById('stats-content');
     el.innerHTML = `
@@ -1122,7 +1162,8 @@
           ['📉 Total Pengeluaran', fRp(data.transactions.filter(t=>t.type==='Pengeluaran').reduce((s,t)=>s+t.amount,0))],
           ['🏦 Akun', data.accounts.length],
           ['🔄 Transfer', data.transfers.length],
-          ['💸 Hutang', data.debts.length]
+          ['💸 Hutang', data.debts.length],
+          ['📅 Tagihan', data.bills.length]
         ].map(([k,v]) => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;"><span>${k}</span><strong>${v}</strong></div>`).join('')}
       </div>
     `;
@@ -1133,10 +1174,7 @@
     const type = document.getElementById('manage-cat-type').value;
     const list = data.customCategories.filter(c => c.type === type);
     const el = document.getElementById('custom-cat-list');
-    if (!list.length) {
-      el.innerHTML = '<div style="color:var(--muted);">Belum ada kategori kustom</div>';
-      return;
-    }
+    if (!list.length) { el.innerHTML = '<div style="color:var(--muted);">Belum ada kategori kustom</div>'; return; }
     el.innerHTML = list.map(c => `
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f1f5f9;">
         <span>${c.label}</span>
@@ -1146,9 +1184,7 @@
     el.querySelectorAll('.del-custom-cat').forEach(b => b.addEventListener('click', function() {
       if (confirm('Hapus kategori ini?')) {
         data.customCategories = data.customCategories.filter(c => c.id !== this.dataset.id);
-        save();
-        renderCustomCategories();
-        fillCatSelect('tx-cat', txType);
+        save(); renderCustomCategories(); fillCatSelect('tx-cat', txType);
         toast('🗑️ Kategori dihapus', 'info');
       }
     }));
@@ -1156,32 +1192,22 @@
   function addCustomCategory() {
     const type = document.getElementById('manage-cat-type').value;
     const label = document.getElementById('manage-cat-label').value.trim();
-    if (!label) {
-      toast('⚠️ Nama kategori wajib!', 'err');
-      return;
-    }
-    if (data.customCategories.find(c => c.type === type && c.label === label)) {
-      toast('⚠️ Kategori sudah ada!', 'err');
-      return;
-    }
+    if (!label) { toast('⚠️ Nama wajib!', 'err'); return; }
+    if (data.customCategories.find(c => c.type === type && c.label === label)) { toast('⚠️ Sudah ada!', 'err'); return; }
     data.customCategories.push({ id: genId(), type, label });
     save();
     document.getElementById('manage-cat-label').value = '';
-    renderCustomCategories();
-    fillCatSelect('tx-cat', txType);
-    toast('✅ Kategori ditambahkan!');
+    renderCustomCategories(); fillCatSelect('tx-cat', txType);
+    toast('✅ Ditambahkan!');
   }
 
   // ============ EXPORT ============
   function escapeCSV(val) {
     if (val === undefined || val === null) return '';
     const str = String(val);
-    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-      return '"' + str.replace(/"/g, '""') + '"';
-    }
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) return '"' + str.replace(/"/g, '""') + '"';
     return str;
   }
-
   function exportCSV() {
     const month = document.getElementById('rep-month').value || currentMonth();
     const [y, m] = month.split('-').map(Number);
@@ -1210,13 +1236,7 @@
     doc.autoTable({
       startY: 35,
       head: [['Tanggal', 'Tipe', 'Kategori', 'Akun', 'Jumlah']],
-      body: tx.sort((a,b)=>b.date.localeCompare(a.date)).map(t => [
-        fDate(t.date),
-        t.type,
-        getCatLabel(t.category),
-        getAccountName(t.accountId),
-        fRp(t.amount)
-      ]),
+      body: tx.sort((a,b)=>b.date.localeCompare(a.date)).map(t => [fDate(t.date), t.type, getCatLabel(t.category), getAccountName(t.accountId), fRp(t.amount)]),
       styles: { fontSize: 8, cellPadding: 2 },
       headStyles: { fillColor: [13, 148, 136], textColor: [255,255,255] }
     });
@@ -1231,9 +1251,7 @@
     reader.onload = ev => {
       try {
         const raw = JSON.parse(ev.target.result);
-        if (!raw.transactions || !Array.isArray(raw.transactions)) {
-          throw new Error('Format file tidak valid: transactions harus array');
-        }
+        if (!raw.transactions || !Array.isArray(raw.transactions)) throw new Error('Format tidak valid');
         if (!confirm('Restore akan mengganti semua data. Lanjutkan?')) return;
         localStorage.setItem('keuanganku_backup_before_restore', backup);
         data = raw;
@@ -1244,20 +1262,20 @@
         if (!data.autoIncomeLog) data.autoIncomeLog = [];
         if (!data.debts) data.debts = [];
         if (!data.transactions) data.transactions = [];
+        if (!data.bills) data.bills = [];
+        if (!data.billPayments) data.billPayments = [];
         data.transactions.forEach(t => t.amount = typeof t.amount === 'number' ? t.amount : 0);
         data.accounts.forEach(a => a.initialBalance = typeof a.initialBalance === 'number' ? a.initialBalance : 0);
+        data.transfers.forEach(t => { t.adminFee = typeof t.adminFee === 'number' ? t.adminFee : 0; });
         data.debts.forEach(d => {
           d.totalAmount = typeof d.totalAmount === 'number' ? d.totalAmount : 0;
           d.paidAmount = typeof d.paidAmount === 'number' ? d.paidAmount : 0;
           if (!d.status) d.status = d.paidAmount >= d.totalAmount ? 'Lunas' : 'Belum Lunas';
         });
-        save();
-        invalidateBalanceCache();
+        save(); invalidateBalanceCache();
         toast('✅ Restore berhasil! (' + data.transactions.length + ' transaksi)');
         showPage('dashboard');
-      } catch (ex) {
-        toast('❌ Gagal restore: ' + ex.message, 'err');
-      }
+      } catch (ex) { toast('❌ Gagal restore: ' + ex.message, 'err'); }
     };
     reader.readAsText(file);
   }
@@ -1269,30 +1287,24 @@
         case 'dashboard': renderDashboard(); break;
         case 'transaksi': setupTxForm(); break;
         case 'transfer': setupTransferForm(); renderTransferHistory(); break;
+        case 'tagihan': renderBillList(); break;
         case 'riwayat': renderHistory(); break;
         case 'hutang': renderDebtList(); break;
         case 'autoincome': renderAutoIncome(); break;
         case 'laporan': renderReport(); break;
         case 'pengaturan': renderAccounts(); renderSettings(); break;
-        default: break;
       }
-    } catch(e) {
-      console.error('Error rendering page:', e);
-    }
+    } catch(e) { console.error('Error rendering page:', e); }
   }
 
   // ============ RESET ============
   function resetAllData() {
     const userInput = prompt('Untuk mereset semua data, ketik RESET (huruf kapital):');
-    if (userInput !== 'RESET') {
-      toast('Reset dibatalkan', 'info');
-      return;
-    }
+    if (userInput !== 'RESET') { toast('Reset dibatalkan', 'info'); return; }
     if (!confirm('Yakin ingin menghapus semua data? Tidak bisa dibatalkan!')) return;
-    data = { transactions: [], debts: [], autoIncomes: [], autoIncomeLog: [], accounts: [], transfers: [], customCategories: [] };
+    data = { transactions: [], debts: [], autoIncomes: [], autoIncomeLog: [], accounts: [], transfers: [], customCategories: [], bills: [], billPayments: [] };
     data.accounts.push({ id: genId(), name: 'Tunai', type: 'cash', initialBalance: 0 });
-    save();
-    invalidateBalanceCache();
+    save(); invalidateBalanceCache();
     toast('🗑️ Data direset');
     showPage('dashboard');
   }
@@ -1302,7 +1314,6 @@
     load();
     document.getElementById('rep-month').value = currentMonth();
 
-    // Navigation
     document.querySelectorAll('#bnav button, #sidebar .snav').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
@@ -1311,32 +1322,54 @@
       });
     });
 
-    // Quick actions
     document.getElementById('quick-in').addEventListener('click', () => { showPage('transaksi'); setTxType('Pemasukan'); });
     document.getElementById('quick-out').addEventListener('click', () => { showPage('transaksi'); setTxType('Pengeluaran'); });
     document.getElementById('quick-transfer').addEventListener('click', () => showPage('transfer'));
     document.getElementById('quick-laporan').addEventListener('click', () => showPage('laporan'));
 
-    // Transaksi
-    document.querySelectorAll('#tx-seg button').forEach(b => {
-      b.addEventListener('click', function() { setTxType(this.dataset.type); });
-    });
+    document.querySelectorAll('#tx-seg button').forEach(b => b.addEventListener('click', function() { setTxType(this.dataset.type); }));
     document.getElementById('btn-save-tx').addEventListener('click', saveTx);
-    document.getElementById('tx-view-date').addEventListener('change', function() {
-      renderTxByDate(this.value);
-    });
-    document.getElementById('btn-manage-cat').addEventListener('click', function() {
-      openModal('m-manage-cat');
-      renderCustomCategories();
-    });
+    document.getElementById('tx-view-date').addEventListener('change', function() { renderTxByDate(this.value); });
+    document.getElementById('btn-manage-cat').addEventListener('click', function() { openModal('m-manage-cat'); renderCustomCategories(); });
 
     // Transfer
     document.getElementById('btn-transfer').addEventListener('click', doTransfer);
+    document.getElementById('tr-from').addEventListener('change', updateTrBalances);
+    document.getElementById('tr-to').addEventListener('change', updateTrBalances);
+    document.getElementById('fee-no').addEventListener('click', () => { processTransfer(0); closeModal('m-transfer-fee'); });
+    document.getElementById('fee-yes').addEventListener('click', () => {
+      document.getElementById('fee-step1').style.display = 'none';
+      document.getElementById('fee-step2').style.display = 'block';
+      updateFeePreview();
+    });
+    document.getElementById('fee-back').addEventListener('click', () => {
+      document.getElementById('fee-step1').style.display = 'block';
+      document.getElementById('fee-step2').style.display = 'none';
+    });
+    document.getElementById('fee-amount').addEventListener('input', updateFeePreview);
+    document.getElementById('fee-confirm').addEventListener('click', () => {
+      const fee = pRp(document.getElementById('fee-amount').value);
+      processTransfer(fee);
+      closeModal('m-transfer-fee');
+    });
+
+    // Tagihan
+    document.querySelectorAll('#page-tagihan .tab-btn').forEach(b => {
+      b.addEventListener('click', function() {
+        document.querySelectorAll('#page-tagihan .tab-btn').forEach(x => x.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('bill-tab-list').style.display = this.dataset.tab === 'list' ? 'block' : 'none';
+        document.getElementById('bill-tab-add').style.display = this.dataset.tab === 'add' ? 'block' : 'none';
+        if (this.dataset.tab === 'add') {
+          fillCatSelect('bill-cat', 'Pengeluaran');
+          fillDaySelect('bill-day');
+        }
+      });
+    });
+    document.getElementById('btn-save-bill').addEventListener('click', saveBill);
 
     // Riwayat
-    ['f-type','f-month','f-search'].forEach(id => {
-      document.getElementById(id).addEventListener('input', renderHistory);
-    });
+    ['f-type','f-month','f-search'].forEach(id => document.getElementById(id).addEventListener('input', renderHistory));
     document.getElementById('btn-reset-filter').addEventListener('click', resetFilter);
 
     // Hutang
@@ -1409,33 +1442,23 @@
     });
     document.getElementById('btn-reset-all').addEventListener('click', resetAllData);
 
-    // Edit TX modal
     document.getElementById('et-save').addEventListener('click', saveEditTx);
     document.getElementById('et-cancel').addEventListener('click', () => closeModal('m-edit-tx'));
 
-    // Confirm modal
     document.getElementById('m-confirm-cancel').addEventListener('click', () => closeModal('m-confirm'));
     document.getElementById('m-confirm-ok').addEventListener('click', function() {
-      if (window._confirmCallback) {
-        window._confirmCallback();
-        window._confirmCallback = null;
-      }
+      if (window._confirmCallback) { window._confirmCallback(); window._confirmCallback = null; }
       closeModal('m-confirm');
     });
 
-    // Kategori modal
     document.getElementById('btn-add-custom-cat').addEventListener('click', addCustomCategory);
     document.getElementById('manage-cat-close').addEventListener('click', () => closeModal('m-manage-cat'));
     document.getElementById('manage-cat-type').addEventListener('change', renderCustomCategories);
 
-    // Close modals on backdrop
     document.querySelectorAll('.mo').forEach(mo => {
-      mo.addEventListener('click', function(e) {
-        if (e.target === this) this.classList.remove('active');
-      });
+      mo.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
     });
 
-    // RP input format
     document.addEventListener('input', function(e) {
       if (e.target.inputMode === 'numeric') {
         let val = e.target.value.replace(/[^0-9]/g, '');
@@ -1446,26 +1469,30 @@
 
     function toggleDebtAccountField() {
       const group = document.getElementById('debt-account-group');
-      if (group) {
-        if (debtType === 'Saya Menghutangi') {
-          group.style.display = 'block';
-          fillAccountSelect('d-account');
-        } else {
-          group.style.display = 'none';
-        }
+      const info = document.getElementById('debt-penitip-info');
+      if (debtType === 'Saya Menghutangi') {
+        group.style.display = 'block';
+        info.style.display = 'none';
+        fillAccountSelect('d-account');
+      } else if (debtType === 'Penitip') {
+        group.style.display = 'none';
+        info.style.display = 'block';
+      } else {
+        group.style.display = 'none';
+        info.style.display = 'none';
       }
     }
     toggleDebtAccountField();
+
     checkAutoIncome();
     showPage('dashboard');
+    // Check bills after short delay so dashboard is loaded first
+    setTimeout(checkBills, 800);
     console.log('Keuanganku siap!');
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
 </script>
 </body>
