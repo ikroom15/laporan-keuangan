@@ -143,7 +143,11 @@
         <div id="d-net-breakdown" style="font-size:11px;opacity:.9;margin-top:6px;"></div>
       </div>
     </div>
-    <div class="card"><div class="sh-title">💰 Saldo Per Akun</div><div id="d-account-balances"></div></div>
+    <div class="card">
+      <div class="sh-title">💰 Saldo Per Akun</div>
+      <div id="d-account-balances"></div>
+      <button class="btn btn-primary" id="btn-add-account-dash" style="background:#7c3aed;margin-top:10px;">➕ Tambah Akun Baru</button>
+    </div>
     <div class="card"><canvas id="barChart" style="max-height:200px;"></canvas></div>
     <div class="card">
       <div class="sh-title">⚡ Aksi Cepat</div>
@@ -305,7 +309,7 @@
 <!-- MODALS -->
 <div id="m-confirm" class="mo"><div class="mb"><div class="m-title" id="m-confirm-title"></div><p id="m-confirm-msg"></p><div style="display:flex;gap:8px;margin-top:12px;"><button class="btn btn-secondary" style="flex:1;" id="m-confirm-cancel">Batal</button><button class="btn btn-danger" style="flex:1;" id="m-confirm-ok">Ya</button></div></div></div>
 <div id="m-edit-tx" class="mo"><div class="mb"><div class="m-title">✏️ Edit Transaksi</div><input type="hidden" id="et-id"><div class="fg"><label>📅 Tanggal</label><input type="date" id="et-date"></div><div class="fg"><label>🏷️ Kategori</label><select id="et-cat"></select></div><div class="fg"><label>💵 Jumlah</label><div class="rp-wrap"><span class="rp-prefix">Rp</span><input type="text" id="et-amount" inputmode="numeric"></div></div><div class="fg"><label>🏦 Akun</label><select id="et-account"></select></div><div class="fg"><label>📝 Deskripsi</label><textarea id="et-desc" rows="2"></textarea></div><div style="display:flex;gap:8px;margin-top:12px;"><button class="btn btn-secondary" style="flex:1;" id="et-cancel">Batal</button><button class="btn btn-primary" style="flex:1;" id="et-save">💾 Simpan</button></div></div></div>
-<div id="m-account" class="mo"><div class="mb"><div class="m-title" id="acc-modal-title">🏦 Tambah Akun</div><input type="hidden" id="acc-edit-id"><div class="fg"><label>📌 Nama</label><input type="text" id="acc-name" placeholder="Misal: BCA, Dana"></div><div class="fg"><label>📂 Jenis</label><select id="acc-type"><option value="cash">💵 Cash</option><option value="bank">🏦 Bank</option><option value="e-wallet">💳 E-Wallet</option></select></div><div class="fg"><label>💰 Saldo Awal</label><div class="rp-wrap"><span class="rp-prefix">Rp</span><input type="text" id="acc-balance" inputmode="numeric" value="0"></div></div><div style="display:flex;gap:8px;margin-top:12px;"><button class="btn btn-secondary" style="flex:1;" id="acc-cancel">Batal</button><button class="btn btn-primary" style="flex:1;" id="acc-save">💾 Simpan</button></div></div></div>
+<div id="m-account" class="mo"><div class="mb"><div class="m-title" id="acc-modal-title">🏦 Tambah Akun</div><input type="hidden" id="acc-edit-id"><div class="fg"><label>📌 Nama</label><input type="text" id="acc-name" placeholder="Misal: BCA, Dana, OVO"></div><div class="fg"><label>📂 Jenis</label><select id="acc-type"><option value="cash">💵 Cash</option><option value="bank">🏦 Bank</option><option value="e-wallet">💳 E-Wallet</option></select></div><div class="fg"><label>💰 Saldo Awal</label><div class="rp-wrap"><span class="rp-prefix">Rp</span><input type="text" id="acc-balance" inputmode="numeric" value="0"></div></div><div style="display:flex;gap:8px;margin-top:12px;"><button class="btn btn-secondary" style="flex:1;" id="acc-cancel">Batal</button><button class="btn btn-primary" style="flex:1;" id="acc-save">💾 Simpan</button></div></div></div>
 
 <!-- MODAL BAYAR HUTANG -->
 <div id="m-pay-debt" class="mo">
@@ -518,12 +522,10 @@
 
     const m = now.getMonth()+1, y = now.getFullYear();
 
-    // Tagihan aktif bulan ini yang belum dibayar
     const activeBills = data.bills
       .filter(b => b.active && !data.billPayments.some(p => p.billId === b.id && p.year === y && p.month === m))
       .reduce((s,b) => s + b.amount, 0);
 
-    // Saldo bersih = Total Saldo − Hutang Aktif − Tagihan Aktif
     const netBalance = totalBalance - activeDebt - activeBills;
     document.getElementById('d-net-balance').textContent = fRp(netBalance);
     const bd = document.getElementById('d-net-breakdown');
@@ -1146,27 +1148,60 @@
       toast('✅ Akun dihapus, data dipindah ke Tunai');
     }));
   }
+
   function saveAccount() {
     const id = document.getElementById('acc-edit-id').value;
     const name = document.getElementById('acc-name').value.trim();
     const type = document.getElementById('acc-type').value;
     const bal = pRp(document.getElementById('acc-balance').value);
-    if (!name) { toast('⚠️ Nama wajib!', 'err'); return; }
-    if (data.accounts.find(a => a.name === name && a.id !== id)) { toast('⚠️ Nama sudah ada!', 'err'); return; }
+
+    if (!name) {
+      toast('⚠️ Nama akun wajib diisi!', 'err');
+      return;
+    }
+
+    const similar = data.accounts.find(a =>
+      a.name.toLowerCase() === name.toLowerCase() && a.id !== id
+    );
+    if (similar && !id) {
+      const ok = confirm(
+        '⚠️ Sudah ada akun bernama "' + similar.name + '".\n\n' +
+        'Tetap tambah akun baru dengan nama yang sama?\n\n' +
+        'Tips: kasih nama beda biar gampang dibedakan.\n' +
+        'Contoh: "' + name + ' 2" atau "' + name + ' Tabungan"'
+      );
+      if (!ok) return;
+    }
+
     if (id) {
       const acc = data.accounts.find(a => a.id === id);
-      if (acc) { acc.name = name; acc.type = type; acc.initialBalance = bal; }
-      toast('✅ Akun diupdate!');
+      if (acc) {
+        acc.name = name;
+        acc.type = type;
+        acc.initialBalance = bal;
+      }
+      toast('✅ Akun "' + name + '" diupdate!');
     } else {
       data.accounts.push({ id: genId(), name, type, initialBalance: bal });
-      toast('✅ Akun ditambahkan!');
+      toast('✅ Akun "' + name + '" ditambahkan!');
     }
-    save(); invalidateBalanceCache(); closeModal('m-account');
+
+    save();
+    invalidateBalanceCache();
+    closeModal('m-account');
+
+    document.getElementById('acc-edit-id').value = '';
+    document.getElementById('acc-name').value = '';
+    document.getElementById('acc-type').value = 'cash';
+    document.getElementById('acc-balance').value = '0';
+
+    ['tx-account','tr-from','tr-to','ai-account','pay-debt-account','d-account','et-account']
+      .forEach(elId => fillAccountSelect(elId));
     renderAccounts();
-    ['tx-account','tr-from','tr-to','ai-account','pay-debt-account','d-account','et-account'].forEach(id => fillAccountSelect(id));
     updateTrBalances();
     renderDashboard();
   }
+
   function renderSettings() {
     const el = document.getElementById('stats-content');
     el.innerHTML = `
@@ -1423,6 +1458,17 @@
     document.getElementById('rep-month').addEventListener('input', renderReport);
     document.getElementById('btn-export-csv').addEventListener('click', exportCSV);
     document.getElementById('btn-export-pdf').addEventListener('click', exportPDF);
+
+    // Tombol Tambah Akun dari Dashboard
+    document.getElementById('btn-add-account-dash').addEventListener('click', function() {
+      document.getElementById('acc-edit-id').value = '';
+      document.getElementById('acc-name').value = '';
+      document.getElementById('acc-type').value = 'cash';
+      document.getElementById('acc-balance').value = '0';
+      document.getElementById('acc-modal-title').textContent = '🏦 Tambah Akun Baru';
+      openModal('m-account');
+      setTimeout(() => document.getElementById('acc-name').focus(), 200);
+    });
 
     document.getElementById('btn-add-account').addEventListener('click', function() {
       document.getElementById('acc-edit-id').value = '';
