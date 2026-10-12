@@ -25,13 +25,17 @@
     @media(min-width:768px) { #sidebar { display: flex; } #bnav { display: none; } #main { margin-left: 220px; } }
     .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
     .sg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-    .sc { padding: 14px; border-radius: 12px; color: #fff; }
+    .sc { padding: 14px; border-radius: 12px; color: #fff; cursor: pointer; transition: transform .15s, box-shadow .15s; position: relative; }
+    .sc:hover { box-shadow: 0 6px 14px rgba(0,0,0,.15); }
+    .sc:active { transform: scale(.97); }
+    .sc::after { content: '›'; position: absolute; top: 10px; right: 12px; font-size: 18px; opacity: .45; font-weight: 700; }
     .sc-bal { background: linear-gradient(135deg, var(--teal), var(--teal2)); grid-column: 1/-1; }
     .sc-in { background: linear-gradient(135deg, #059669, #10b981); }
     .sc-out { background: linear-gradient(135deg, #dc2626, #f87171); }
     .sc-debt { background: linear-gradient(135deg, #d97706, #fbbf24); }
     .sc-today { background: linear-gradient(135deg, #be123c, #f472b6); }
-    .sc-net { background: linear-gradient(135deg, #7c3aed, #8b5cf6); grid-column: 1/-1; }
+    .sc-net { background: linear-gradient(135deg, #7c3aed, #8b5cf6); grid-column: 1/-1; cursor: default; }
+    .sc-net::after { content: ''; }
     .sc .sl { font-size: 10px; font-weight: 700; opacity: .8; text-transform: uppercase; }
     .sc .sv { font-size: 18px; font-weight: 800; word-break: break-word; }
     .fg { margin-bottom: 14px; }
@@ -107,6 +111,11 @@
     .tx-summary .row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
     .tx-summary .row + .row { border-top: 1px dashed #a7f3d0; }
     .tx-summary .row.total { border-top: 2px solid #a7f3d0; margin-top: 4px; padding-top: 6px; font-weight: 700; font-size: 14px; }
+
+    /* 🔎 Badge filter aktif di riwayat */
+    .filter-badge { display: inline-flex; align-items: center; gap: 6px; background: #ccfbf1; color: #0d9488; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; margin-bottom: 10px; }
+    .filter-badge .x { cursor: pointer; font-weight: 900; }
+    body.dark .filter-badge { background: #0d9488; color: #fff; }
 
     /* 🌙 DARK MODE */
     body.dark { --bg: #0f172a; --card: #1e293b; --border: #334155; --muted: #94a3b8; color: #e2e8f0; background: #0f172a; }
@@ -189,11 +198,21 @@
   <div id="page-dashboard" class="page active">
     <div class="ph"><h1>💰 Keuanganku</h1><p id="d-date"></p></div>
     <div class="sg">
-      <div class="sc sc-bal"><div class="sl">Total Saldo</div><div class="sv" id="d-total-balance">Rp 0</div></div>
-      <div class="sc sc-in"><div class="sl">Pemasukan Bulan Ini</div><div class="sv" id="d-income">Rp 0</div></div>
-      <div class="sc sc-out"><div class="sl">Pengeluaran Bulan Ini</div><div class="sv" id="d-expense">Rp 0</div></div>
-      <div class="sc sc-debt"><div class="sl">Hutang Aktif</div><div class="sv" id="d-debt">Rp 0</div></div>
-      <div class="sc sc-today"><div class="sl">Pengeluaran Hari Ini</div><div class="sv" id="d-today-out">Rp 0</div></div>
+      <div class="sc sc-bal" id="card-bal" title="Lihat semua transaksi">
+        <div class="sl">Total Saldo</div><div class="sv" id="d-total-balance">Rp 0</div>
+      </div>
+      <div class="sc sc-in" id="card-in" title="Lihat pemasukan bulan ini">
+        <div class="sl">Pemasukan Bulan Ini</div><div class="sv" id="d-income">Rp 0</div>
+      </div>
+      <div class="sc sc-out" id="card-out" title="Lihat pengeluaran bulan ini">
+        <div class="sl">Pengeluaran Bulan Ini</div><div class="sv" id="d-expense">Rp 0</div>
+      </div>
+      <div class="sc sc-debt" id="card-debt" title="Lihat hutang aktif">
+        <div class="sl">Hutang Aktif</div><div class="sv" id="d-debt">Rp 0</div>
+      </div>
+      <div class="sc sc-today" id="card-today" title="Lihat pengeluaran hari ini">
+        <div class="sl">Pengeluaran Hari Ini</div><div class="sv" id="d-today-out">Rp 0</div>
+      </div>
     </div>
     <div class="sg" style="grid-template-columns:1fr;">
       <div class="sc sc-net">
@@ -282,10 +301,12 @@
       <div class="filter-row">
         <select id="f-type"><option value="">Semua Tipe</option><option value="Pemasukan">📈 Pemasukan</option><option value="Pengeluaran">📉 Pengeluaran</option></select>
         <input type="month" id="f-month">
+        <input type="date" id="f-date" title="Filter tanggal">
         <input type="text" id="f-search" placeholder="Cari...">
         <button class="btn btn-sm btn-secondary" id="btn-reset-filter">Reset</button>
       </div>
     </div>
+    <div id="filter-active-badge"></div>
     <div id="h-list"></div>
   </div>
 
@@ -589,6 +610,16 @@
     let saved = 'light';
     try { saved = localStorage.getItem('keuanganku_theme') || 'light'; } catch (e) {}
     applyTheme(saved);
+  }
+
+  // ============ NAVIGASI CEPAT KE RIWAYAT ============
+  function openHistoryWith(opts) {
+    opts = opts || {};
+    document.getElementById('f-type').value = opts.type || '';
+    document.getElementById('f-month').value = opts.month || '';
+    document.getElementById('f-date').value = opts.date || '';
+    document.getElementById('f-search').value = opts.search || '';
+    showPage('riwayat');
   }
 
   // ============ DASHBOARD ============
@@ -971,6 +1002,7 @@
   function renderHistory() {
     const type = document.getElementById('f-type').value;
     const month = document.getElementById('f-month').value;
+    const dateF = document.getElementById('f-date').value;
     const search = document.getElementById('f-search').value.toLowerCase();
     let list = [...data.transactions].sort((a,b) => b.date.localeCompare(a.date));
     if (type) list = list.filter(t => t.type === type);
@@ -978,15 +1010,40 @@
       const [y, m] = month.split('-').map(Number);
       list = list.filter(t => { const my = getMY(t.date); return my.m === m && my.y === y; });
     }
+    if (dateF) list = list.filter(t => t.date === dateF);
     if (search) {
       list = list.filter(t => (t.description||'').toLowerCase().includes(search) ||
         getCatLabel(t.category).toLowerCase().includes(search) ||
         getAccountName(t.accountId).toLowerCase().includes(search) ||
         fRp(t.amount).toLowerCase().includes(search) || t.type.toLowerCase().includes(search));
     }
+
+    // Badge info filter aktif
+    const badgeEl = document.getElementById('filter-active-badge');
+    const badges = [];
+    if (type) badges.push((type === 'Pemasukan' ? '📈 ' : '📉 ') + type);
+    if (month) {
+      const [yy, mm] = month.split('-').map(Number);
+      badges.push('📅 ' + MONTHS[mm-1] + ' ' + yy);
+    }
+    if (dateF) badges.push('🗓️ ' + fDate(dateF));
+    if (search) badges.push('🔍 "' + search + '"');
+    if (badges.length) {
+      badgeEl.innerHTML = `<div class="filter-badge">${badges.join(' · ')} <span class="x" id="clear-badge">✕</span></div>`;
+      const cb = document.getElementById('clear-badge');
+      if (cb) cb.onclick = resetFilter;
+    } else {
+      badgeEl.innerHTML = '';
+    }
+
     const el = document.getElementById('h-list');
     if (list.length === 0) { el.innerHTML = '<div class="empty">Tidak ada transaksi</div>'; return; }
-    el.innerHTML = list.map(t => {
+
+    const totIn = list.filter(t => t.type === 'Pemasukan').reduce((s,t) => s + t.amount, 0);
+    const totOut = list.filter(t => t.type === 'Pengeluaran').reduce((s,t) => s + t.amount, 0);
+    const selisih = totIn - totOut;
+
+    const itemsHTML = list.map(t => {
       const isIn = t.type === 'Pemasukan';
       return `<div class="tx-item">
         <div class="tx-icon ${isIn?'in':'out'}">${(getCatLabel(t.category)||'📦').split(' ')[0]}</div>
@@ -994,9 +1051,18 @@
         <div class="tx-amt ${isIn?'in':'out'}">${isIn?'+':'−'}${fRp(t.amount)}</div>
       </div>`;
     }).join('');
+
+    const summaryHTML = `
+      <div class="tx-summary" style="margin-top:14px;">
+        <div class="row"><span>📈 Total Pemasukan</span><strong style="color:var(--green);">+${fRp(totIn)}</strong></div>
+        <div class="row"><span>📉 Total Pengeluaran</span><strong style="color:var(--red);">−${fRp(totOut)}</strong></div>
+        <div class="row total"><span>💰 Selisih</span><strong style="color:${selisih >= 0 ? 'var(--green)' : 'var(--red)'};">${selisih >= 0 ? '+' : '−'}${fRp(Math.abs(selisih))}</strong></div>
+      </div>`;
+
+    el.innerHTML = itemsHTML + summaryHTML;
   }
   function resetFilter() {
-    ['f-type','f-month','f-search'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    ['f-type','f-month','f-date','f-search'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     renderHistory();
   }
 
@@ -1005,7 +1071,13 @@
   function renderDebtList() {
     const el = document.getElementById('debt-list');
     if (data.debts.length === 0) { el.innerHTML = '<div class="empty">Belum ada hutang</div>'; return; }
-    el.innerHTML = data.debts.map(d => {
+    // Yang belum lunas tampil di atas
+    const sorted = [...data.debts].sort((a, b) => {
+      const ap = a.status === 'Lunas' ? 1 : 0;
+      const bp = b.status === 'Lunas' ? 1 : 0;
+      return ap - bp;
+    });
+    el.innerHTML = sorted.map(d => {
       const rem = d.totalAmount - d.paidAmount;
       const paid = d.status === 'Lunas';
       const isOwe = d.debtType === 'Saya Berhutang';
@@ -1482,6 +1554,28 @@
     const btnT = document.getElementById('btn-theme-toggle');
     if (btnT) btnT.addEventListener('click', toggleTheme);
 
+    // 🎯 Kartu dashboard bisa diklik
+    document.getElementById('card-bal').addEventListener('click', function() {
+      openHistoryWith({});
+    });
+    document.getElementById('card-in').addEventListener('click', function() {
+      openHistoryWith({ type: 'Pemasukan', month: currentMonth() });
+    });
+    document.getElementById('card-out').addEventListener('click', function() {
+      openHistoryWith({ type: 'Pengeluaran', month: currentMonth() });
+    });
+    document.getElementById('card-debt').addEventListener('click', function() {
+      showPage('hutang');
+      // pastikan tab "Daftar" aktif
+      setTimeout(() => {
+        const listTab = document.querySelector('#page-hutang .tab-btn[data-tab="list"]');
+        if (listTab) listTab.click();
+      }, 0);
+    });
+    document.getElementById('card-today').addEventListener('click', function() {
+      openHistoryWith({ type: 'Pengeluaran', date: today() });
+    });
+
     document.getElementById('quick-in').addEventListener('click', () => { showPage('transaksi'); setTxType('Pemasukan'); });
     document.getElementById('quick-out').addEventListener('click', () => { showPage('transaksi'); setTxType('Pengeluaran'); });
     document.getElementById('quick-transfer').addEventListener('click', () => showPage('transfer'));
@@ -1526,7 +1620,7 @@
     });
     document.getElementById('btn-save-bill').addEventListener('click', saveBill);
 
-    ['f-type','f-month','f-search'].forEach(id => document.getElementById(id).addEventListener('input', renderHistory));
+    ['f-type','f-month','f-date','f-search'].forEach(id => document.getElementById(id).addEventListener('input', renderHistory));
     document.getElementById('btn-reset-filter').addEventListener('click', resetFilter);
 
     document.querySelectorAll('#page-hutang .tab-btn').forEach(b => {
