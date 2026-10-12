@@ -97,6 +97,64 @@
     .bill-card { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
     .bill-card.active { border-color: #a7f3d0; background: #f0fdf4; }
     .bill-card.paid { border-color: #e5e7eb; background: #f9fafb; opacity: .7; }
+
+    /* 🔘 Tombol tema */
+    #theme-toggle { position: fixed; top: 12px; right: 12px; z-index: 100; width: 42px; height: 42px; border-radius: 50%; border: none; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: .2s; }
+    #theme-toggle:active { transform: scale(.9); }
+
+    /* 📊 Ringkasan total transaksi */
+    .tx-summary { margin-top: 12px; padding: 12px; background: #f0fdf4; border-radius: 8px; }
+    .tx-summary .row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
+    .tx-summary .row + .row { border-top: 1px dashed #a7f3d0; }
+    .tx-summary .row.total { border-top: 2px solid #a7f3d0; margin-top: 4px; padding-top: 6px; font-weight: 700; font-size: 14px; }
+
+    /* 🌙 DARK MODE */
+    body.dark { --bg: #0f172a; --card: #1e293b; --border: #334155; --muted: #94a3b8; color: #e2e8f0; background: #0f172a; }
+    body.dark .card { background: #1e293b; color: #e2e8f0; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
+    body.dark .sh-title { color: #f1f5f9; }
+    body.dark input, body.dark select, body.dark textarea { background: #0f172a; color: #e2e8f0; border-color: #334155; }
+    body.dark input:focus, body.dark select:focus, body.dark textarea:focus { background: #1e293b; }
+    body.dark input[type="date"], body.dark input[type="month"] { color-scheme: dark; }
+    body.dark label { color: #cbd5e1; }
+    body.dark .rp-prefix { color: #cbd5e1; }
+    body.dark .btn-secondary { background: #334155; color: #e2e8f0; }
+    body.dark .btn-danger { background: #7f1d1d; color: #fecaca; }
+    body.dark .btn-success { background: #065f46; color: #a7f3d0; }
+    body.dark #bnav { background: #1e293b; border-top-color: #334155; }
+    body.dark #bnav button { color: #64748b; }
+    body.dark #bnav button.active { color: #2dd4bf; }
+    body.dark #sidebar { background: #1e293b; border-right-color: #334155; }
+    body.dark #sidebar .snav { color: #94a3b8; }
+    body.dark #sidebar .snav.active { background: #0d9488; color: #fff; }
+    body.dark .tx-item { border-bottom-color: #334155; }
+    body.dark .tx-cat { color: #f1f5f9; }
+    body.dark .tx-desc, body.dark .tx-date { color: #94a3b8; }
+    body.dark .tx-icon.in { background: #064e3b; }
+    body.dark .tx-icon.out { background: #7f1d1d; }
+    body.dark .account-card { border-bottom-color: #334155; }
+    body.dark .debt-card { border-color: #334155; }
+    body.dark .debt-card.unpaid { background: #422006; border-color: #92400e; }
+    body.dark .debt-card.paid { background: #064e3b; border-color: #059669; }
+    body.dark .debt-card.penitip { background: #1e3a8a; border-color: #3b82f6; }
+    body.dark .bill-card { border-color: #334155; }
+    body.dark .bill-card.active { background: #064e3b; border-color: #059669; }
+    body.dark .bill-card.paid { background: #1e293b; }
+    body.dark .seg { background: #334155; }
+    body.dark .seg button { color: #94a3b8; }
+    body.dark .seg button.active { background: #1e293b; color: #2dd4bf; }
+    body.dark .tab-bar { background: #334155; }
+    body.dark .tab-btn { color: #94a3b8; }
+    body.dark .tab-btn.active { background: #1e293b; color: #2dd4bf; }
+    body.dark .mb { background: #1e293b; color: #e2e8f0; }
+    body.dark .m-title { color: #f1f5f9; }
+    body.dark .empty { color: #64748b; }
+    body.dark .fee-summary { background: #064e3b; color: #d1fae5; }
+    body.dark #toast { background: #334155; }
+    body.dark .tx-summary { background: #064e3b; }
+    body.dark .tx-summary .row + .row, body.dark .tx-summary .row.total { border-color: #059669; }
+    body.dark #theme-toggle { background: #334155; color: #fbbf24; }
+    body.dark .debt-card .debt-account-info { color: #94a3b8; }
+    body.dark .ph { box-shadow: 0 4px 12px rgba(0,0,0,.4); }
   </style>
 </head>
 <body>
@@ -124,6 +182,7 @@
 </nav>
 
 <div id="toast"></div>
+<button id="theme-toggle" title="Ganti Tema">🌙</button>
 
 <div id="main">
   <!-- DASHBOARD -->
@@ -297,6 +356,10 @@
         <button class="btn btn-secondary" id="btn-backup">📥 Download Backup</button>
         <label class="btn btn-secondary" style="cursor:pointer;">📤 Restore JSON <input type="file" id="restore-file" accept=".json" style="display:none;"></label>
       </div>
+    </div>
+    <div class="card">
+      <div class="sh-title">🎨 Tampilan</div>
+      <button class="btn btn-secondary" id="btn-theme-toggle" style="width:100%;margin-top:8px;">🌙 Mode Gelap</button>
     </div>
     <div class="card"><div class="sh-title">📊 Statistik</div><div id="stats-content"></div></div>
     <div class="card" style="border:2px solid #fca5a5;">
@@ -507,6 +570,27 @@
     for (let i = 1; i <= 28; i++) el.innerHTML += `<option value="${i}">Tanggal ${i}</option>`;
   }
 
+  // ============ THEME ============
+  function applyTheme(theme) {
+    const isDark = theme === 'dark';
+    document.body.classList.toggle('dark', isDark);
+    const btn = document.getElementById('theme-toggle');
+    if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+    const btn2 = document.getElementById('btn-theme-toggle');
+    if (btn2) btn2.textContent = isDark ? '☀️ Mode Terang' : '🌙 Mode Gelap';
+    try { localStorage.setItem('keuanganku_theme', theme); } catch (e) {}
+    if (currentPage === 'dashboard') { try { renderDashboard(); } catch (e) {} }
+  }
+  function toggleTheme() {
+    const isDark = document.body.classList.contains('dark');
+    applyTheme(isDark ? 'light' : 'dark');
+  }
+  function loadTheme() {
+    let saved = 'light';
+    try { saved = localStorage.getItem('keuanganku_theme') || 'light'; } catch (e) {}
+    applyTheme(saved);
+  }
+
   // ============ DASHBOARD ============
   let barChart = null;
   function renderDashboard() {
@@ -561,6 +645,9 @@
         inc.push(data.transactions.filter(t => { const my = getMY(t.date); return t.type==='Pemasukan' && my.m===lm && my.y===ly; }).reduce((s,t)=>s+t.amount,0));
         exp.push(data.transactions.filter(t => { const my = getMY(t.date); return t.type==='Pengeluaran' && my.m===lm && my.y===ly; }).reduce((s,t)=>s+t.amount,0));
       }
+      const isDark = document.body.classList.contains('dark');
+      const gridColor = isDark ? 'rgba(148,163,184,.2)' : 'rgba(0,0,0,.08)';
+      const tickColor = isDark ? '#cbd5e1' : '#374151';
       barChart = new Chart(ctx, {
         type: 'bar',
         data: { labels, datasets: [
@@ -568,8 +655,8 @@
           { label: 'Pengeluaran', data: exp, backgroundColor: 'rgba(248,113,113,.8)', borderRadius: 4 }
         ]},
         options: { responsive: true, maintainAspectRatio: true,
-          plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } },
-          scales: { x: { grid: { display: false } }, y: { beginAtZero: true } } }
+          plugins: { legend: { position: 'bottom', labels: { font: { size: 10 }, color: tickColor } } },
+          scales: { x: { grid: { display: false }, ticks: { color: tickColor } }, y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: tickColor } } } }
       });
     }
   }
@@ -612,22 +699,40 @@
   function renderTxByDate(date) {
     const list = data.transactions.filter(t => t.date === date);
     const el = document.getElementById('tx-list-by-date');
-    if (list.length === 0) { el.innerHTML = '<div class="empty">Tidak ada transaksi tanggal '+fDate(date)+'</div>'; return; }
-    list.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-    el.innerHTML = list.map(t => {
+    if (list.length === 0) {
+      el.innerHTML = '<div class="empty">Tidak ada transaksi tanggal ' + fDate(date) + '</div>';
+      return;
+    }
+    list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const totalIn  = list.filter(t => t.type === 'Pemasukan').reduce((s, t) => s + t.amount, 0);
+    const totalOut = list.filter(t => t.type === 'Pengeluaran').reduce((s, t) => s + t.amount, 0);
+    const selisih  = totalIn - totalOut;
+
+    const itemsHTML = list.map(t => {
       const isIn = t.type === 'Pemasukan';
       return `<div class="tx-item">
-        <div class="tx-icon ${isIn?'in':'out'}">${(getCatLabel(t.category)||'📦').split(' ')[0]}</div>
-        <div class="tx-info"><div class="tx-cat">${getCatLabel(t.category)}</div><div class="tx-desc">${t.description||''} · ${getAccountName(t.accountId)}</div></div>
+        <div class="tx-icon ${isIn ? 'in' : 'out'}">${(getCatLabel(t.category) || '📦').split(' ')[0]}</div>
+        <div class="tx-info"><div class="tx-cat">${getCatLabel(t.category)}</div><div class="tx-desc">${t.description || ''} · ${getAccountName(t.accountId)}</div></div>
         <div style="display:flex;gap:4px;align-items:center;">
-          <div class="tx-amt ${isIn?'in':'out'}">${isIn?'+':'−'}${fRp(t.amount)}</div>
+          <div class="tx-amt ${isIn ? 'in' : 'out'}">${isIn ? '+' : '−'}${fRp(t.amount)}</div>
           <button class="btn btn-sm btn-secondary edit-tx-btn" data-id="${t.id}">✏️</button>
           <button class="btn btn-sm btn-danger del-tx-btn" data-id="${t.id}">🗑️</button>
         </div>
       </div>`;
     }).join('');
-    el.querySelectorAll('.edit-tx-btn').forEach(b => b.addEventListener('click', function(e) { e.stopPropagation(); openEditTx(this.dataset.id); }));
-    el.querySelectorAll('.del-tx-btn').forEach(b => b.addEventListener('click', function(e) {
+
+    const summaryHTML = `
+      <div class="tx-summary">
+        <div class="row"><span>📈 Total Pemasukan</span><strong style="color:var(--green);">+${fRp(totalIn)}</strong></div>
+        <div class="row"><span>📉 Total Pengeluaran</span><strong style="color:var(--red);">−${fRp(totalOut)}</strong></div>
+        <div class="row total"><span>💰 Selisih</span><strong style="color:${selisih >= 0 ? 'var(--green)' : 'var(--red)'};">${selisih >= 0 ? '+' : '−'}${fRp(Math.abs(selisih))}</strong></div>
+      </div>`;
+
+    el.innerHTML = itemsHTML + summaryHTML;
+
+    el.querySelectorAll('.edit-tx-btn').forEach(b => b.addEventListener('click', function (e) { e.stopPropagation(); openEditTx(this.dataset.id); }));
+    el.querySelectorAll('.del-tx-btn').forEach(b => b.addEventListener('click', function (e) {
       e.stopPropagation();
       if (confirm('Hapus transaksi ini?')) {
         data.transactions = data.transactions.filter(t => t.id !== this.dataset.id);
@@ -1362,6 +1467,7 @@
   // ============ INIT ============
   function init() {
     load();
+    loadTheme();
     document.getElementById('rep-month').value = currentMonth();
 
     document.querySelectorAll('#bnav button, #sidebar .snav').forEach(btn => {
@@ -1371,6 +1477,10 @@
         if (page) showPage(page);
       });
     });
+
+    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+    const btnT = document.getElementById('btn-theme-toggle');
+    if (btnT) btnT.addEventListener('click', toggleTheme);
 
     document.getElementById('quick-in').addEventListener('click', () => { showPage('transaksi'); setTxType('Pemasukan'); });
     document.getElementById('quick-out').addEventListener('click', () => { showPage('transaksi'); setTxType('Pengeluaran'); });
