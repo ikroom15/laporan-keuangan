@@ -213,7 +213,7 @@
   <div id="page-dashboard" class="page active">
     <div class="ph"><h1>💰 Keuanganku</h1><p id="d-date"></p></div>
     <div class="sg">
-      <div class="sc sc-bal" id="card-bal" title="Lihat semua transaksi">
+      <div class="sc sc-bal" id="card-bal" title="Lihat mutasi total saldo">
         <div class="sl">Total Saldo</div><div class="sv" id="d-total-balance">Rp 0</div>
       </div>
       <div class="sc sc-in" id="card-in" title="Lihat pemasukan bulan ini">
@@ -651,7 +651,7 @@
     showPage('riwayat');
   }
 
-  // ============ MUTASI REKENING ============
+  // ============ MUTASI REKENING (PER AKUN) ============
   function showAccountMutations(accId) {
     const acc = data.accounts.find(a => a.id === accId);
     if (!acc) return;
@@ -693,7 +693,7 @@
       }
     });
 
-    // Urutkan dari terlama ke terbaru untuk menghitung saldo berjalan
+    // Urutkan dari terlama ke terbaru
     allMuts.sort((a, b) => {
       if (a.date !== b.date) return a.date.localeCompare(b.date);
       return String(a.createdAt).localeCompare(String(b.createdAt));
@@ -706,34 +706,91 @@
       m.runningBal = currentBal;
     });
 
-    // Balik urutan untuk tampil (terbaru di atas)
     const displayMuts = [...allMuts].reverse();
 
     document.getElementById('mut-title').textContent = '🏦 Mutasi: ' + acc.name;
     document.getElementById('mut-bal-info').innerHTML = `Saldo Awal: <strong>${fRp(acc.initialBalance)}</strong> &middot; Saldo Akhir: <strong style="color:var(--teal);">${fRp(currentBal)}</strong>`;
 
+    renderMutList(displayMuts);
+    openModal('m-account-mutations');
+  }
+  window._showMut = showAccountMutations;
+
+  // ============ MUTASI TOTAL SALDO ============
+  function showTotalMutations() {
+    const allMuts = [];
+    const initialTotal = data.accounts.reduce((s, a) => s + (a.initialBalance || 0), 0);
+
+    // Kumpulkan transaksi
+    data.transactions.forEach(t => {
+      allMuts.push({
+        date: t.date,
+        createdAt: t.createdAt || t.date,
+        desc: (t.type === 'Pemasukan' ? '[Masuk] ' : '[Keluar] ') + getCatLabel(t.category) + ' (' + getAccountName(t.accountId) + ')' + (t.description ? ' - ' + t.description : ''),
+        type: t.type,
+        amount: t.amount,
+        isTransfer: false
+      });
+    });
+
+    // Kumpulkan transfer (hanya biaya admin yang mempengaruhi total saldo)
+    data.transfers.forEach(tr => {
+      const fee = tr.adminFee || 0;
+      allMuts.push({
+        date: tr.date,
+        createdAt: tr.createdAt || tr.date,
+        desc: `🔄 Transfer: ${getAccountName(tr.fromAccountId)} → ${getAccountName(tr.toAccountId)}` + (fee > 0 ? ` (Biaya: ${fRp(fee)})` : ''),
+        type: 'Pengeluaran',
+        amount: fee,
+        isTransfer: true
+      });
+    });
+
+    // Urutkan dari terlama ke terbaru
+    allMuts.sort((a, b) => {
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      return String(a.createdAt).localeCompare(String(b.createdAt));
+    });
+
+    let currentBal = initialTotal;
+    allMuts.forEach(m => {
+      if (m.type === 'Pemasukan') currentBal += m.amount;
+      else currentBal -= m.amount;
+      m.runningBal = currentBal;
+    });
+
+    const displayMuts = [...allMuts].reverse();
+
+    document.getElementById('mut-title').textContent = '💰 Mutasi Total Saldo';
+    document.getElementById('mut-bal-info').innerHTML = `Saldo Awal: <strong>${fRp(initialTotal)}</strong> &middot; Total Saldo Akhir: <strong style="color:var(--teal);">${fRp(currentBal)}</strong>`;
+
+    renderMutList(displayMuts);
+    openModal('m-account-mutations');
+  }
+  window._showTotalMut = showTotalMutations;
+
+  // Helper render mutasi
+  function renderMutList(displayMuts) {
     const listEl = document.getElementById('mut-list');
     if (displayMuts.length === 0) {
-      listEl.innerHTML = '<div class="empty">Belum ada mutasi pada akun ini.</div>';
+      listEl.innerHTML = '<div class="empty">Belum ada mutasi.</div>';
     } else {
       listEl.innerHTML = displayMuts.map(m => {
         const isIn = m.type === 'Pemasukan';
+        const amtStyle = m.amount === 0 ? 'color:var(--muted);' : '';
         return `<div class="mut-item">
           <div class="mut-info">
             <div class="mut-date">${fDate(m.date)}</div>
-            <div class="mut-desc">${m.desc}</div>
+            <div class="mut-desc" style="${m.isTransfer ? 'color:var(--muted); font-size:12px;' : ''}">${m.desc}</div>
           </div>
           <div class="mut-amt-wrap">
-            <div class="mut-amt ${isIn?'in':'out'}">${isIn?'+':'−'}${fRp(m.amount)}</div>
+            <div class="mut-amt ${isIn?'in':'out'}" style="${amtStyle}">${m.amount === 0 ? 'Rp 0' : (isIn?'+':'−') + fRp(m.amount)}</div>
             <div class="mut-bal">Sisa: ${fRp(m.runningBal)}</div>
           </div>
         </div>`;
       }).join('');
     }
-
-    openModal('m-account-mutations');
   }
-  window._showMut = showAccountMutations;
 
   // ============ DASHBOARD ============
   let barChart = null;
@@ -1677,7 +1734,7 @@
 
     // 🎯 Kartu dashboard bisa diklik
     document.getElementById('card-bal').addEventListener('click', function() {
-      openHistoryWith({});
+      showTotalMutations();
     });
     document.getElementById('card-in').addEventListener('click', function() {
       openHistoryWith({ type: 'Pemasukan', month: currentMonth() });
